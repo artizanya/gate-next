@@ -1,0 +1,11 @@
+# dependencies
+/external
+/node_modules
+
+# generators
+
+# building
+/.next
+
+# misc
+.tern-port
