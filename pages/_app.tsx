@@ -17,7 +17,7 @@ class GateApp extends App {
 
     return {
       pageProps,
-    }
+    };
   }
 
   render () {
