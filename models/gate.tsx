@@ -14,7 +14,7 @@ interface ProcessTreeTreeItem {
   children?: ProcessTreeTreeItem[];
 }
 
-type ProcessTreeTreeData = ProcessTreeTreeItem[];
+export type ProcessTreeData = ProcessTreeTreeItem[];
 
 class ProcessTree implements StateModelInterface {
   constructor() {
@@ -32,20 +32,20 @@ class ProcessTree implements StateModelInterface {
   }
 
   setTreeData(
-    value: ProcessTreeTreeData,
+    value: ProcessTreeData,
     shouldUpdate: boolean = true): void
   {
     this._treeData = value;
     if(shouldUpdate) this.updateCallback();
   }
 
-  get treeData(): ProcessTreeTreeData {
+  get treeData(): ProcessTreeData {
     return this._treeData;
   }
 
   updateCallback: StateModelUpdateCallback;
 
-  private _treeData: ProcessTreeTreeData;
+  private _treeData: ProcessTreeData;
 }
 
 interface GateState {

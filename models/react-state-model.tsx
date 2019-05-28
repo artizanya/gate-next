@@ -34,22 +34,26 @@ export interface StateModelProviderProps {
 
 export function createStateModelProvider<
   State, Model extends StateModelInterface
->(Model: StateModelConstructor<State, Model>)
+>(Model: StateModelConstructor<State, Model>): [
+  (props: StateModelProviderProps) => JSX.Element,
+  () => Model,
+  React.Context<Model>
+]
 {
   const StateModelContext = createContext<Model>(null as unknown as Model);
 
-  function StateModelContextProvider(props: StateModelProviderProps) {
+  const StateModelContextProvider = (props: StateModelProviderProps) => {
     const stateModel = useStateModel(Model);
     return (
       <StateModelContext.Provider value={stateModel}>
         {props.children}
       </StateModelContext.Provider>
     );
-  }
+  };
 
-  function useStateModelContext() {
+  const useStateModelContext = () => {
     return useContext(StateModelContext);
-  }
+  };
 
   return [StateModelContextProvider, useStateModelContext, StateModelContext];
 }
