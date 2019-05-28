@@ -6,7 +6,7 @@ import {
 
 class GateApp extends App {
   static async getInitialProps(
-    {Component, ctx }: NextAppContext): Promise<DefaultAppIProps>
+    { Component, ctx }: NextAppContext): Promise<DefaultAppIProps>
   {
     let pageProps = {};
 
