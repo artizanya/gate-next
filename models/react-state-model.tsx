@@ -38,7 +38,8 @@ export function createStateModelProvider<
   (props: StateModelProviderProps) => JSX.Element,
   () => Model,
   React.Context<Model>
-] {
+]
+{
   const StateModelContext = createContext<Model>(null as unknown as Model);
 
   const StateModelContextProvider = (props: StateModelProviderProps) => {

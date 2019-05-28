@@ -7,14 +7,14 @@ import {
   createStateModelProvider,
 } from './react-state-model';
 
-interface ProcessTreeTreeItem {
+interface ProcessTreeItem {
   title: string;
   subtitle?: string;
   expanded?: boolean;
-  children?: ProcessTreeTreeItem[];
+  children?: ProcessTreeItem[];
 }
 
-export type ProcessTreeData = ProcessTreeTreeItem[];
+export type ProcessTreeData = ProcessTreeItem[];
 
 class ProcessTree implements StateModelInterface {
   constructor() {

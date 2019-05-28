@@ -1,11 +1,13 @@
-import App, { Container, NextAppContext } from 'next/app';
+import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
 import {
   GateModelContextProvider
 } from '../models/gate';
 
 class GateApp extends App {
-  static async getInitialProps({ Component, ctx }: NextAppContext) {
+  static async getInitialProps(
+    {Component, ctx }: NextAppContext): Promise<DefaultAppIProps>
+  {
     let pageProps = {};
 
     // Provide the store to getInitialProps of pages
