@@ -1,6 +1,14 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 /* global module */
 
+// Inspired by the following resources:
+// https://dev.to/robertcoopercode/using-eslint-and-prettier-in-a-typescript-project-53jb
+// https://github.com/flycheck/flycheck/issues/514
+// https://github.com/cerner/eslint-config-terra
+
+// To consider:
+// https://www.npmjs.com/package/@liquid-labs/catalyst-scripts
+
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
