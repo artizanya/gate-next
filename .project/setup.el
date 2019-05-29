@@ -3,8 +3,11 @@
 (setq-local tide-tsserver-executable
             (concat (rh-project-get-root) "node_modules/.bin/tsserver"))
 
-(setq-local flycheck-typescript-tslint-executable
-            (concat (rh-project-get-root) "node_modules/.bin/tslint"))
+;; (setq-local flycheck-typescript-tslint-executable
+;;             (concat (rh-project-get-root) "node_modules/.bin/tslint"))
+
+(setq-local flycheck-javascript-eslint-executable
+            (concat (rh-project-get-root) "node_modules/.bin/eslint"))
 
 (let ((project-root (rh-project-get-root))
       file-rpath ext-js)
@@ -12,6 +15,7 @@
     (setq file-rpath (abbreviate-file-name
                       (expand-file-name buffer-file-name project-root)))
     (cond ((string-match-p "\\.ts\\'\\|\\.tsx\\'" file-rpath)
+           (setq-local flycheck-checker 'javascript-eslint)
            (rh-setup-typescript-tide))
           ((or (string-match-p "^#!.*node" (save-excursion
                                              (goto-char (point-min))

@@ -18,7 +18,7 @@ export type ProcessTreeData = ProcessTreeItem[];
 
 class ProcessTree implements StateModelInterface {
   constructor() {
-    this.updateCallback = () => {
+    this.updateCallback = (): void => {
       throw 'ProcessTree.setUpdateCallback() must be called ' +
             'before running any modifying methods.';
     };
@@ -33,8 +33,8 @@ class ProcessTree implements StateModelInterface {
 
   setTreeData(
     value: ProcessTreeData,
-    shouldUpdate: boolean = true): void
-  {
+    shouldUpdate: boolean = true,
+  ): void {
     this._treeData = value;
     if(shouldUpdate) this.updateCallback();
   }
@@ -56,7 +56,7 @@ type GateModelSetState = StateModelSetState<GateState>;
 
 export class GateModel implements StateModelInterface {
   static get initialState(): GateState {
-    let processTree = new ProcessTree();
+    const processTree = new ProcessTree();
 
     return {
       processTree,
@@ -67,7 +67,7 @@ export class GateModel implements StateModelInterface {
     this._state = state;
     this._setState = setState;
 
-    for(let stateProperty of Object.values(this._state)) {
+    for(const stateProperty of Object.values(this._state)) {
       if(stateProperty.updateCallback) {
         stateProperty.updateCallback = this.updateCallback;
       }
@@ -78,8 +78,8 @@ export class GateModel implements StateModelInterface {
     return this._state.processTree;
   }
 
-  updateCallback = () => {
-    this._setState({...this._state});
+  updateCallback = (): void => {
+    this._setState({ ...this._state });
   }
 
   private _state: GateState;
@@ -91,5 +91,5 @@ const [GateModelContextProvider, useGateModelContext] =
 
 export {
   GateModelContextProvider,
-  useGateModelContext
+  useGateModelContext,
 };

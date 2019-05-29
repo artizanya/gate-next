@@ -1,3 +1,4 @@
+import React from 'react'
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
 import {
@@ -22,7 +23,7 @@ class GateApp extends App {
     };
   }
 
-  render () {
+  render(): JSX.Element {
     const { Component, pageProps } = this.props;
     return (
       <Container>
