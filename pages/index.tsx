@@ -1,15 +1,22 @@
+// Hey Emacs, this is -*- coding: utf-8 -*-
+
+import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
+type ProcessTreeModule = typeof import('../components/ProcessTree');
+
 const ProcessTree = dynamic(
-  () => import('../components/ProcessTreeState'),
-  { ssr: false }
+  (): Promise<ProcessTreeModule> => (
+    import('../components/ProcessTree')
+  ),
+  { ssr: false },
 );
 
-const Index = () => (
+const Index = (): JSX.Element => (
   <div>
     <Link href="/about">
-      <a title="About Page">About Page</a>
+      <a href="/about" title="About Page">About Page</a>
     </Link>
     <p>Process Tree</p>
     <ProcessTree />

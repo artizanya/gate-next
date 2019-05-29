@@ -1,14 +1,16 @@
-import React from 'react'
+// Hey Emacs, this is -*- coding: utf-8 -*-
+
+import React from 'react';
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
 import {
-  GateModelContextProvider
+  GateModelContextProvider,
 } from '../models/gate';
 
 class GateApp extends App {
   static async getInitialProps(
-    { Component, ctx }: NextAppContext): Promise<DefaultAppIProps>
-  {
+    { Component, ctx }: NextAppContext,
+  ): Promise<DefaultAppIProps> {
     let pageProps = {};
 
     // Provide the store to getInitialProps of pages

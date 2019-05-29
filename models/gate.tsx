@@ -3,7 +3,7 @@
 import {
   StateModelInterface,
   StateModelSetState,
-  StateModelUpdateCallback,
+  // StateModelUpdateCallback,
   createStateModelProvider,
 } from './react-state-model';
 
@@ -18,10 +18,10 @@ export type ProcessTreeData = ProcessTreeItem[];
 
 class ProcessTree implements StateModelInterface {
   constructor() {
-    this.updateCallback = (): void => {
-      throw 'ProcessTree.setUpdateCallback() must be called ' +
-            'before running any modifying methods.';
-    };
+    // this.updateCallback = (): void => {
+    //   throw 'ProcessTree.setUpdateCallback() must be called ' +
+    //         'before running any modifying methods.';
+    // };
 
     this._treeData = [{
       title: 'Chicken',
@@ -43,7 +43,12 @@ class ProcessTree implements StateModelInterface {
     return this._treeData;
   }
 
-  updateCallback: StateModelUpdateCallback;
+  // updateCallback: StateModelUpdateCallback;
+
+  updateCallback = (): void => {
+    throw 'ProcessTree.setUpdateCallback() must be called ' +
+    'before running any modifying methods.';
+  };
 
   private _treeData: ProcessTreeData;
 }
