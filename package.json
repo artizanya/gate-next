@@ -14,8 +14,6 @@
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
-    "mobx": "^5.9.4",
-    "mobx-react-lite": "^1.3.2",
     "next": "^8.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -23,7 +21,7 @@
   },
   "devDependencies": {
     "@types/next": "^8.0.5",
-    "@types/react": "^16.8.17",
+    "@types/react": "^16.8.19",
     "@types/react-dom": "^16.8.4",
     "@types/react-sortable-tree": "^0.3.6",
     "tslint": "^5.16.0",
