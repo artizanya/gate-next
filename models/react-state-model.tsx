@@ -4,13 +4,22 @@ import React, { useState, createContext, useContext } from 'react';
 
 export type StateModelUpdateCallback = () => void;
 
-export interface StateModelInterface {
-  updateCallback: StateModelUpdateCallback;
+class UnallocatedUpdateCallback extends Error {
+  constructor() {
+    super('ProcessTree.setUpdateCallback() must be called ' +
+          'before running any modifying methods.');
+  }
 }
 
-interface StateModelConstructor<State, Model extends StateModelInterface> {
+export class StateModel {
+  updateCallback = (): void => {
+    throw new UnallocatedUpdateCallback();
+  };
+}
+
+interface StateModelConstructor<State, Model extends StateModel> {
   initialState: State;
-  new (
+  new(
     state: State,
     setState: React.Dispatch<React.SetStateAction<State>>
   ): Model;
@@ -20,7 +29,7 @@ export type StateModelSetState<State> =
   React.Dispatch<React.SetStateAction<State>>;
 
 export function useStateModel<
-  State, Model extends StateModelInterface
+  State, Model extends StateModel
 >(Model: StateModelConstructor<State, Model>): Model {
   const [state, setState] = useState(Model.initialState);
   return new Model(state, setState);
@@ -31,7 +40,7 @@ export interface StateModelProviderProps {
 }
 
 export function createStateModelProvider<
-  State, Model extends StateModelInterface
+  State, Model extends StateModel
 >(Model: StateModelConstructor<State, Model>): [
   (props: StateModelProviderProps) => JSX.Element,
   () => Model,

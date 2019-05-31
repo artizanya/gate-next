@@ -1,9 +1,8 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
 import {
-  StateModelInterface,
+  StateModel,
   StateModelSetState,
-  // StateModelUpdateCallback,
   createStateModelProvider,
 } from './react-state-model';
 
@@ -16,12 +15,9 @@ interface ProcessTreeItem {
 
 export type ProcessTreeData = ProcessTreeItem[];
 
-class ProcessTree implements StateModelInterface {
+class ProcessTree extends StateModel {
   constructor() {
-    // this.updateCallback = (): void => {
-    //   throw 'ProcessTree.setUpdateCallback() must be called ' +
-    //         'before running any modifying methods.';
-    // };
+    super();
 
     this._treeData = [{
       title: 'Chicken',
@@ -43,13 +39,6 @@ class ProcessTree implements StateModelInterface {
     return this._treeData;
   }
 
-  // updateCallback: StateModelUpdateCallback;
-
-  updateCallback = (): void => {
-    throw 'ProcessTree.setUpdateCallback() must be called ' +
-    'before running any modifying methods.';
-  };
-
   private _treeData: ProcessTreeData;
 }
 
@@ -59,7 +48,7 @@ interface GateState {
 
 type GateModelSetState = StateModelSetState<GateState>;
 
-export class GateModel implements StateModelInterface {
+export class GateModel extends StateModel {
   static get initialState(): GateState {
     const processTree = new ProcessTree();
 
@@ -69,14 +58,15 @@ export class GateModel implements StateModelInterface {
   }
 
   constructor(state: GateState, setState: GateModelSetState) {
+    super();
+
     this._state = state;
     this._setState = setState;
 
-    for(const stateProperty of Object.values(this._state)) {
-      if(stateProperty.updateCallback) {
-        stateProperty.updateCallback = this.updateCallback;
-      }
-    }
+    const stateProperties: StateModel[] = Object.values(this._state);
+    stateProperties.forEach((stateProperty): void => {
+      stateProperty.updateCallback = this.updateCallback;
+    });
   }
 
   get processTree(): ProcessTree {

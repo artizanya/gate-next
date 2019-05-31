@@ -48,6 +48,7 @@ module.exports = {
         while: { after: false },
       },
     }],
+    'no-param-reassign': ['error', { props: false }],
     quotes: ['error', 'single'],
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/explicit-member-accessibility': ['warn', {
