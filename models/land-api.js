@@ -32,7 +32,7 @@ prom.then(data => console.log('data returned:', data));
 prom = fetch('https://api.tvmaze.com/search/shows?q=batman');
 
 
-await fetch('http://localhost:8529/_db/_system/land', {
+resp = await fetch('http://localhost:8529/_db/_system/land', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -48,4 +48,6 @@ await fetch('http://localhost:8529/_db/_system/land', {
       }
     }`,
   }),
-});
+}).then(r => r.json());
+
+await resp.json();

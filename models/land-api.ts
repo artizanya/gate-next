@@ -24,3 +24,21 @@ fetch('http://localhost:8529/_db/_system/land', {
 })
   .then(r => r.json())
   .then(data => console.log('data returned:', data));
+
+resp = await fetch('http://localhost:8529/_db/_system/land', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+  body: JSON.stringify({
+    query: `query GetElement {
+      element(id: "0001") {
+        collection
+        id
+        name
+        description
+      }
+    }`,
+  }),
+}).then(r => r.json());
