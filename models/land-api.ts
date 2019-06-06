@@ -33,7 +33,7 @@ resp = await fetch('http://localhost:8529/_db/_system/land', {
   },
   body: JSON.stringify({
     query: `query GetElement {
-      element(id: "0001") {
+      element(id: "0000") {
         collection
         id
         name

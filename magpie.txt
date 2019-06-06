@@ -1,0 +1,24 @@
+https://github.com/developit/unfetch
+
+Fetch timeout:
+https://github.com/github/fetch/issues/175#issuecomment-216791333
+https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
+https://stackoverflow.com/questions/31061838/how-do-i-cancel-an-http-fetch-request
+
+
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async request() {
+  try {
+    let res = await timeout(1000, fetch('/hello'));
+  } catch(error) {
+    // might be a timeout error
+  }
+}
+
+
+https://github.com/ghengeveld/react-async
+https://github.com/axios/axios
+https://github.com/niftylettuce/frisbee
