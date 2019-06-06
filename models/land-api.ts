@@ -32,13 +32,18 @@ resp = await fetch('http://localhost:8529/_db/_system/land', {
     Accept: 'application/json',
   },
   body: JSON.stringify({
-    query: `query GetElement {
-      element(id: "0000") {
-        collection
-        id
-        name
-        description
+    query: `
+      query GetElement($id: String!) {
+        element(id: $id) {
+          collection
+          id
+          name
+          description
+        }
       }
-    }`,
+    `,
+    variables: {
+      id: "0001",
+    },
   }),
 }).then(r => r.json());

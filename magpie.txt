@@ -22,3 +22,7 @@ async request() {
 https://github.com/ghengeveld/react-async
 https://github.com/axios/axios
 https://github.com/niftylettuce/frisbee
+
+
+
+https://github.com/pashky/restclient.el
