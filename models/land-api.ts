@@ -47,3 +47,11 @@ resp = await fetch('http://localhost:8529/_db/_system/land', {
     },
   }),
 }).then(r => r.json());
+
+function add(a: number, b: number) {
+  return a + b;
+}
+
+add(1, 2);
+
+add('a', 'b');
