@@ -1,7 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-// import fetch from 'isomorphic-unfetch';
-const fetch = require('isomorphic-unfetch');
+import fetch from 'isomorphic-unfetch';
 
 prom = fetch('http://localhost:8529/_db/_system/land', {
   method: 'POST',
