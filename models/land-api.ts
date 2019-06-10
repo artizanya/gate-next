@@ -24,10 +24,6 @@ fetch('http://localhost:8529/_db/_system/land', {
   .then(r => r.json())
   .then(data => console.log('data returned:', data));
 
-// see https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-imports-being-elided-in-my-emit
-import 'isomorphic-unfetch';
-import fetch from 'isomorphic-unfetch';
-
 await fetch('http://localhost:8529/_db/_system/land', {
   method: 'POST',
   headers: {
@@ -46,7 +42,7 @@ await fetch('http://localhost:8529/_db/_system/land', {
       }
     `,
     variables: {
-      id: "0001",
+      id: "0000",
     },
   }),
 }).then(r => r.json());
