@@ -2,7 +2,7 @@
 
 import fetch from 'isomorphic-unfetch';
 
-fetch('http://localhost:8529/_db/_system/land', {
+prom = fetch('http://localhost:8529/_db/_system/land', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
