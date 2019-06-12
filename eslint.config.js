@@ -53,6 +53,8 @@ module.exports = {
     }],
     'no-param-reassign': ['error', { props: false }],
     quotes: ['error', 'single'],
+    // Let tide (or tsc) and js2-mode handle undefined variables
+    '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/explicit-member-accessibility': ['warn', {
       accessibility: 'no-public',

@@ -1,8 +1,11 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
 import fetch from 'isomorphic-unfetch';
+import { ProcessTreeData } from './gate';
 
-await fetch('http://localhost:8529/_db/_system/land', {
+const landUri = 'http://localhost:8529/_db/_system/land';
+
+const processQueryResult = await fetch(landUri, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -10,12 +13,21 @@ await fetch('http://localhost:8529/_db/_system/land', {
   },
   body: JSON.stringify({
     query: `
-      query GetElement($id: String!) {
-        element(id: $id) {
+      query GetProcess($id: String!) {
+        process(id: $id) {
           collection
           id
           name
-          description
+          inComponents {
+            collection
+            id
+            name
+          }
+          outComponents {
+            collection
+            id
+            name
+          }
         }
       }
     `,
@@ -24,3 +36,44 @@ await fetch('http://localhost:8529/_db/_system/land', {
     },
   }),
 }).then((r): any => r.json());
+
+const { process } = processQueryResult.data;
+
+const treeData: ProcessTreeData = [];
+
+treeData.push({
+  collection: process.collection,
+  id: process.id,
+  title: process.name,
+  children: [{
+    collection: 'output',
+    id: process.id,
+    title: 'Output Components',
+    children: [],
+  }, {
+    collection: 'input',
+    id: process.id,
+    title: 'Input Components',
+    children: [],
+  }],
+});
+
+const outComponents = treeData[0].children![0].children!;
+
+for(const component of process.outComponents) {
+  outComponents.push({
+    collection: component.collection,
+    id: component.id,
+    title: component.name,
+  });
+}
+
+const inComponents = treeData[0].children![1].children!;
+
+for(const component of process.inComponents) {
+  inComponents.push({
+    collection: component.collection,
+    id: component.id,
+    title: component.name,
+  });
+}

@@ -8,6 +8,8 @@ import {
 
 interface ProcessTreeItem {
   title: string;
+  id?: string;
+  collection?: string;
   subtitle?: string;
   expanded?: boolean;
   children?: ProcessTreeItem[];
