@@ -27,11 +27,11 @@ prom = fetch('http://localhost:8529/_db/_system/land', {
 await fetch('http://localhost:8529/_db/_system/land', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
     Accept: 'application/json',
   },
   body: JSON.stringify({
-    query: `
+    'query': `
       query GetElement($id: String!) {
         element(id: $id) {
           collection
@@ -48,7 +48,7 @@ await fetch('http://localhost:8529/_db/_system/land', {
 }).then(r => r.json());
 
 function add(a: number, b: number) {
-  return a + b;
+  return a + b
 }
 
 add(1, 2);

@@ -34,8 +34,11 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified
     // from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
-    'max-len': ['warn', 80],
+    // 'max-len': ['warn', 80],
+    'max-len': ['error', 80, { ignoreUrls: true }],
     'operator-linebreak': ['error', 'after'],
+    // Let tide (or tsc) and js2-mode handle undefined variables
+    'no-undef': 'off',
     'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
     'no-underscore-dangle': ['error', { allowAfterThis: true }],
     'lines-between-class-members': [
