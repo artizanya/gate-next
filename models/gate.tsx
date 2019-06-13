@@ -6,7 +6,7 @@ import {
   createStateModelProvider,
 } from './react-state-model';
 
-interface ProcessTreeItem {
+export interface ProcessTreeItem {
   title: string;
   id?: string;
   collection?: string;
