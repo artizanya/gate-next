@@ -12,6 +12,8 @@ const processQueryResult = await fetch(landUri, {
     Accept: 'application/json',
   },
   body: JSON.stringify({
+    // https://github.com/apollographql/eslint-plugin-graphql
+    // use gql literal stub for now - until there is a nedd for AST
     query: `
       query GetProcess($id: String!) {
         process(id: $id) {
