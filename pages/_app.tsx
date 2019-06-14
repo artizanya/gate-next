@@ -3,9 +3,7 @@
 import React from 'react';
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
-import {
-  GateModelContextProvider,
-} from '../models/gate';
+import { GateModelContextProvider } from '../models/gate';
 
 class GateApp extends App {
   static async getInitialProps(

@@ -38,7 +38,7 @@ module.exports = {
     'max-len': ['error', 80, { ignoreUrls: true }],
     'operator-linebreak': ['error', 'after'],
     // Let tide (or tsc) and js2-mode handle undefined variables
-    'no-undef': 'off',
+    // 'no-undef': 'off',
     'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
     'no-underscore-dangle': ['error', { allowAfterThis: true }],
     'lines-between-class-members': [
@@ -54,8 +54,9 @@ module.exports = {
     'no-param-reassign': ['error', { props: false }],
     quotes: ['error', 'single'],
     // Let tide (or tsc) and js2-mode handle undefined variables
-    '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/indent': ['error', 2],
+    // '@typescript-eslint/no-unused-vars': 'off',
+    indent: 'off',
+    '@typescript-eslint/indent': ['warn', 2],
     '@typescript-eslint/explicit-member-accessibility': ['warn', {
       accessibility: 'no-public',
     }],

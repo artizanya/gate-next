@@ -4,7 +4,7 @@ import React, { useState, createContext, useContext } from 'react';
 
 export type StateModelUpdateCallback = () => void;
 
-class UnallocatedUpdateCallback extends Error {
+class UpdateCallbackUnallocatedError extends Error {
   constructor() {
     super('ProcessTree.setUpdateCallback() must be called ' +
           'before running any modifying methods.');
@@ -13,7 +13,7 @@ class UnallocatedUpdateCallback extends Error {
 
 export class StateModel {
   updateCallback = (): void => {
-    throw new UnallocatedUpdateCallback();
+    throw new UpdateCallbackUnallocatedError();
   };
 }
 
@@ -35,21 +35,21 @@ export function useStateModel<
   return new Model(state, setState);
 }
 
-export interface StateModelProviderProps {
+export interface StateModelContextProviderProps {
   children?: React.ReactNode;
 }
 
-export function createStateModelProvider<
+export function createStateModelContextProvider<
   State, Model extends StateModel
 >(Model: StateModelConstructor<State, Model>): [
-  (props: StateModelProviderProps) => JSX.Element,
+  (props: StateModelContextProviderProps) => JSX.Element,
   () => Model,
   React.Context<Model>
 ] {
   const StateModelContext = createContext<Model>(null as unknown as Model);
 
   const StateModelContextProvider =
-    (props: StateModelProviderProps): JSX.Element => {
+    (props: StateModelContextProviderProps): JSX.Element => {
       const stateModel = useStateModel(Model);
       return (
         <StateModelContext.Provider value={stateModel}>
