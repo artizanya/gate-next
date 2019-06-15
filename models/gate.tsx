@@ -113,10 +113,11 @@ export class GateModel extends StateModel {
     this._state = state;
     this._setState = setState;
 
-    const stateProperties: StateModel[] = Object.values(this._state);
-    stateProperties.forEach((stateProperty): void => {
-      stateProperty.updateCallback = this.updateCallback;
-    });
+    // const stateProperties: StateModel[] = Object.values(this._state);
+    // stateProperties.forEach((stateProperty): void => {
+    //   stateProperty.updateCallback = this.updateCallback;
+    // });
+    this._state.processTree.updateCallback = this.updateCallback;
   }
 
   get processTree(): ProcessTree {
@@ -131,8 +132,10 @@ export class GateModel extends StateModel {
   private _setState: GateModelSetState;
 }
 
-const [GateModelContextProvider, useGateModelContext] =
-  createStateModelContextProvider(GateModel);
+const [
+  GateModelContextProvider,
+  useGateModelContext,
+] = createStateModelContextProvider(GateModel);
 
 export {
   GateModelContextProvider,
