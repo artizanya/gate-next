@@ -10,10 +10,10 @@ import 'react-sortable-tree/style.css';
 
 function ProcessTree(): JSX.Element {
   const gateModel = useGateModelContext();
-  const gateApi = useGateApiContext();
+  const { land } = useGateApiContext();
 
   useEffect((): void => {
-    gateApi.land.loadProcessTree();
+    land.loadProcessTree();
   }, []);
 
   console.log('**** here');

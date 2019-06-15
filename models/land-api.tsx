@@ -3,7 +3,12 @@
 import React, { createContext, useContext } from 'react';
 
 import fetch from 'isomorphic-unfetch';
-import { ProcessTreeData, GateModel, useGateModelContext, ProcessTreeProcess } from './gate';
+import {
+  ProcessTreeData,
+  GateModel,
+  useGateModelContext,
+  ProcessTreeProcess,
+} from './gate';
 
 class LandApi {
   constructor(
@@ -144,9 +149,9 @@ export default function createLandApiContextProvider(): [
   const GateApiContextProvider =
     (props: LandApiContextProviderProps): JSX.Element => {
       const gateModel = useGateModelContext();
-      const apiExternal = new GateApi(gateModel);
+      const gateApi = new GateApi(gateModel);
       return (
-        <GateApiContext.Provider value={apiExternal}>
+        <GateApiContext.Provider value={gateApi}>
           {props.children}
         </GateApiContext.Provider>
       );
