@@ -23,8 +23,8 @@ function ProcessTree(): JSX.Element {
       <SortableTree
         treeData={gateModel.processTree.treeData}
         onChange={(treeData): void => (
-          gateApi.land.setTreeData(treeData as ProcessTreeData)
-          // gateModel.processTree.setTreeData(treeData as ProcessTreeData)
+          // gateApi.land.setTreeData(treeData as ProcessTreeData)
+          gateModel.processTree.setTreeData(treeData as ProcessTreeData)
         )}
       />
     </div>
