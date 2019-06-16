@@ -1,6 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useRef } from 'react';
 
 import fetch from 'isomorphic-unfetch';
 import {
@@ -138,41 +138,43 @@ interface LandApiContextProviderProps {
   children?: React.ReactNode;
 }
 
+type GateApiRef = React.MutableRefObject<GateApi>;
+
 export default function createLandApiContextProvider(): [
   (props: LandApiContextProviderProps) => JSX.Element,
-  () => GateApi,
-  // React.Context<GateApi>,
+  () => GateApiRef,
+  // React.Context<GateApiRef>,
 ] {
-  const GateApiContext =
-    createContext<GateApi>(null as unknown as GateApi);
+  const GateApiRefContext =
+    createContext<GateApiRef>(null as unknown as GateApiRef);
 
-  const GateApiContextProvider =
+  const GateApiRefContextProvider =
     (props: LandApiContextProviderProps): JSX.Element => {
       const gateModel = useGateModelContext();
-      const gateApi = new GateApi(gateModel);
+      const gateApiRef = useRef(new GateApi(gateModel));
       return (
-        <GateApiContext.Provider value={gateApi}>
+        <GateApiRefContext.Provider value={gateApiRef}>
           {props.children}
-        </GateApiContext.Provider>
+        </GateApiRefContext.Provider>
       );
     };
 
-  const useGateApiContext =
-    (): GateApi => useContext(GateApiContext);
+  const useGateApiRefContext =
+    (): GateApiRef => useContext(GateApiRefContext);
 
   return [
-    GateApiContextProvider,
-    useGateApiContext,
-    // GateApiContext,
+    GateApiRefContextProvider,
+    useGateApiRefContext,
+    // GateApiRefContext,
   ];
 }
 
 const [
-  GateApiContextProvider,
-  useGateApiContext,
+  GateApiRefContextProvider,
+  useGateApiRefContext,
 ] = createLandApiContextProvider();
 
 export {
-  GateApiContextProvider,
-  useGateApiContext,
+  GateApiRefContextProvider,
+  useGateApiRefContext,
 };

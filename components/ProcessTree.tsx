@@ -4,17 +4,18 @@ import React, { useEffect } from 'react';
 import SortableTree from 'react-sortable-tree';
 
 import { useGateModelContext, ProcessTreeData } from '../models/gate';
-import { useGateApiContext } from '../models/land-api';
+import { useGateApiRefContext } from '../models/land-api';
 
 import 'react-sortable-tree/style.css';
 
 function ProcessTree(): JSX.Element {
   const gateModel = useGateModelContext();
-  const { land } = useGateApiContext();
+  const gateApiRef = useGateApiRefContext();
 
   useEffect((): void => {
-    land.loadProcessTree();
-  }, []);
+    const gateApi = gateApiRef.current;
+    gateApi.land.loadProcessTree();
+  }, [gateApiRef]);
 
   console.log('**** here');
 
