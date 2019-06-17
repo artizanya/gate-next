@@ -4,7 +4,7 @@ import React from 'react';
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
 import { GateModelContextProvider } from '../models/gate';
-import { GateApiRefContextProvider } from '../models/land-api';
+import { GateApiContextProvider } from '../models/land-api';
 
 class GateApp extends App {
   static async getInitialProps(
@@ -29,9 +29,9 @@ class GateApp extends App {
     return (
       <Container>
         <GateModelContextProvider>
-          <GateApiRefContextProvider>
+          <GateApiContextProvider>
             <Component {...pageProps} />
-          </GateApiRefContextProvider>
+          </GateApiContextProvider>
         </GateModelContextProvider>
       </Container>
     );

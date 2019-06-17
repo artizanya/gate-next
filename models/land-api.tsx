@@ -1,6 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import React, { createContext, useContext, useRef } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 import fetch from 'isomorphic-unfetch';
 import {
@@ -15,27 +15,32 @@ const configLandUri = 'http://localhost:8529/_db/_system/land';
 
 class LandSource {
   constructor(uri: string) {
-    this._uri = uri;
+    this.uri = uri;
   }
 
-  get uri(): string {
-    return this._uri;
-  }
-
-  private _uri: string;
+  uri: string;
 }
+
+type LandSourceState = LandSource;
+
+type LandSourceSetState =
+  React.Dispatch<React.SetStateAction<LandSourceState>>;
 
 class LandApi {
   constructor(
     gateModel: GateModel,
-    source: LandSource,
+    sourceState: LandSourceState,
+    sourceSetState: LandSourceSetState,
   ) {
     this._gateModel = gateModel;
-    this._source = source;
+    this._sourceState = sourceState;
+    this._sourceSetState = sourceSetState;
   }
 
   async loadProcessTree(): Promise<void> {
-    const processQueryResult = await fetch(this._source.uri, {
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
+    const processQueryResult = await fetch(this.source.uri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,73 +139,102 @@ class LandApi {
   }
 
   get source(): LandSource {
-    return this._source;
+    return this._sourceState;
+  }
+
+  set source(value: LandSource) {
+    console.log('!!!!!!!!!!!!!!!!!');
+    this._sourceSetState(value);
+  }
+
+  setSourceUri(uri: string): void {
+    this.source = new LandSource(uri);
   }
 
   private _gateModel: GateModel;
-  private _source: LandSource;
+  private _sourceState: LandSourceState;
+  private _sourceSetState: LandSourceSetState;
 }
 
-class GateApi {
-  constructor(gateModel: GateModel, landSource: LandSource) {
-    this._gateModel = gateModel;
-    this._landApi = new LandApi(gateModel, landSource);
+export class GateApi {
+  constructor(
+    gateModel: GateModel,
+    sourceState: LandSourceState,
+    sourceSetState: LandSourceSetState,
+  ) {
+    this._model = gateModel;
+    this._landApi = new LandApi(gateModel, sourceState, sourceSetState);
   }
 
-  get gateModel(): GateModel {
-    return this._gateModel;
+  get model(): GateModel {
+    return this._model;
   }
 
   get landApi(): LandApi {
     return this._landApi;
   }
 
-  private _gateModel: GateModel;
+  private _model: GateModel;
   private _landApi: LandApi;
 }
 
-type GateApiRef = React.MutableRefObject<GateApi>;
-
-interface GateApiRefContextProviderProps {
+interface GateApiContextProviderProps {
   children?: React.ReactNode;
 }
 
-export default function createGateApiRefContextProvider(): [
-  (props: GateApiRefContextProviderProps) => JSX.Element,
-  () => GateApiRef,
+function createGateApiContextProvider(): [
+  (props: GateApiContextProviderProps) => JSX.Element,
+  () => GateApi,
   // React.Context<GateApi>,
 ] {
-  const GateApiRefContext =
-    createContext<GateApiRef>(null as unknown as GateApiRef);
+  const GateApiContext =
+    createContext<GateApi>(null as unknown as GateApi);
 
-  const GateApiRefContextProvider =
-    (props: GateApiRefContextProviderProps): JSX.Element => {
+  const GateApiContextProvider =
+    (props: GateApiContextProviderProps): JSX.Element => {
       const gateModel = useGateModelContext();
-      const landSource = new LandSource(configLandUri);
-      const gateApiRef = useRef(new GateApi(gateModel, landSource));
+
+      const [
+        landSourceState,
+        landSourceStateSet,
+      ] = useState(new LandSource(configLandUri));
+
+      console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', landSourceState.uri);
+
+      const gateApi = new GateApi(
+        gateModel,
+        landSourceState,
+        landSourceStateSet,
+      );
+
+      // TODO: This should happen only in development mode!
+      if(typeof window !== 'undefined') {
+        window.gateApi = gateApi;
+      }
+
       return (
-        <GateApiRefContext.Provider value={gateApiRef}>
+        <GateApiContext.Provider value={gateApi}>
           {props.children}
-        </GateApiRefContext.Provider>
+        </GateApiContext.Provider>
       );
     };
 
-  const useGateApiRefContext =
-    (): GateApiRef => useContext(GateApiRefContext);
+  const useGateApiContext =
+    (): GateApi => useContext(GateApiContext);
 
   return [
-    GateApiRefContextProvider,
-    useGateApiRefContext,
-    // GateApiRefContext,
+    GateApiContextProvider,
+    useGateApiContext,
+    // GateApiContext,
   ];
 }
 
 const [
-  GateApiRefContextProvider,
-  useGateApiRefContext,
-] = createGateApiRefContextProvider();
+  GateApiContextProvider,
+  useGateApiContext,
+] = createGateApiContextProvider();
 
 export {
-  GateApiRefContextProvider,
-  useGateApiRefContext,
+  GateApiContextProvider,
+  useGateApiContext,
 };

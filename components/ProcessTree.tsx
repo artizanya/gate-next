@@ -1,36 +1,31 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import SortableTree from 'react-sortable-tree';
 
-import { useGateModelContext, ProcessTreeData } from '../models/gate';
-import { useGateApiRefContext } from '../models/land-api';
+import { ProcessTreeData } from '../models/gate';
+import { useGateApiContext } from '../models/land-api';
 
 import 'react-sortable-tree/style.css';
 
 function ProcessTree(): JSX.Element {
-  const gateModel = useGateModelContext();
-  const gateApiRef = useGateApiRefContext();
-  const gateApi = gateApiRef.current;
-
-  // useEffect((): void => {
-  //   const { landApi } = gateApiRef.current;
-  //   landApi.loadProcessTree();
-  // }, [gateApiRef, gateApi.landApi.source]);
+  const api = useGateApiContext();
+  const apiRef = useRef(api);
 
   useEffect((): void => {
-    gateApi.landApi.loadProcessTree();
-  }, [gateApi]);
+    const { landApi } = apiRef.current;
+    landApi.loadProcessTree();
+  }, [apiRef, api.landApi.source]);
 
   console.log('**** here');
 
   return (
     <div style={{ height: 600 }}>
       <SortableTree
-        treeData={gateModel.processTree.treeData}
+        treeData={api.model.processTree.treeData}
         onChange={(treeData): void => (
-          // gateApi.land.setTreeData(treeData as ProcessTreeData)
-          gateModel.processTree.setTreeData(treeData as ProcessTreeData)
+          // api.land.setTreeData(treeData as ProcessTreeData)
+          api.model.processTree.setTreeData(treeData as ProcessTreeData)
         )}
       />
     </div>
