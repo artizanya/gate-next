@@ -10,17 +10,32 @@ import {
   ProcessTreeProcess,
 } from './gate';
 
+// TODO: landUri should be moved to global config
+const configLandUri = 'http://localhost:8529/_db/_system/land';
+
+class LandSource {
+  constructor(uri: string) {
+    this._uri = uri;
+  }
+
+  get uri(): string {
+    return this._uri;
+  }
+
+  private _uri: string;
+}
+
 class LandApi {
   constructor(
     gateModel: GateModel,
-    landUri: string = 'http://localhost:8529/_db/_system/land',
+    source: LandSource,
   ) {
     this._gateModel = gateModel;
-    this._landUri = landUri;
+    this._source = source;
   }
 
   async loadProcessTree(): Promise<void> {
-    const processQueryResult = await fetch(this._landUri, {
+    const processQueryResult = await fetch(this._source.uri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -118,40 +133,51 @@ class LandApi {
     this._gateModel.processTree.setTreeData(value);
   }
 
+  get source(): LandSource {
+    return this._source;
+  }
+
   private _gateModel: GateModel;
-  private _landUri: string;
+  private _source: LandSource;
 }
 
 class GateApi {
-  constructor(gateModel: GateModel) {
-    this._land = new LandApi(gateModel);
+  constructor(gateModel: GateModel, landSource: LandSource) {
+    this._gateModel = gateModel;
+    this._landApi = new LandApi(gateModel, landSource);
   }
 
-  get land(): LandApi {
-    return this._land;
+  get gateModel(): GateModel {
+    return this._gateModel;
   }
 
-  private _land: LandApi;
-}
+  get landApi(): LandApi {
+    return this._landApi;
+  }
 
-interface LandApiContextProviderProps {
-  children?: React.ReactNode;
+  private _gateModel: GateModel;
+  private _landApi: LandApi;
 }
 
 type GateApiRef = React.MutableRefObject<GateApi>;
 
-export default function createLandApiContextProvider(): [
-  (props: LandApiContextProviderProps) => JSX.Element,
+interface GateApiRefContextProviderProps {
+  children?: React.ReactNode;
+}
+
+export default function createGateApiRefContextProvider(): [
+  (props: GateApiRefContextProviderProps) => JSX.Element,
   () => GateApiRef,
-  // React.Context<GateApiRef>,
+  // React.Context<GateApi>,
 ] {
   const GateApiRefContext =
     createContext<GateApiRef>(null as unknown as GateApiRef);
 
   const GateApiRefContextProvider =
-    (props: LandApiContextProviderProps): JSX.Element => {
+    (props: GateApiRefContextProviderProps): JSX.Element => {
       const gateModel = useGateModelContext();
-      const gateApiRef = useRef(new GateApi(gateModel));
+      const landSource = new LandSource(configLandUri);
+      const gateApiRef = useRef(new GateApi(gateModel, landSource));
       return (
         <GateApiRefContext.Provider value={gateApiRef}>
           {props.children}
@@ -172,7 +198,7 @@ export default function createLandApiContextProvider(): [
 const [
   GateApiRefContextProvider,
   useGateApiRefContext,
-] = createLandApiContextProvider();
+] = createGateApiRefContextProvider();
 
 export {
   GateApiRefContextProvider,

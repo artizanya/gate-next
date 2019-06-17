@@ -11,11 +11,16 @@ import 'react-sortable-tree/style.css';
 function ProcessTree(): JSX.Element {
   const gateModel = useGateModelContext();
   const gateApiRef = useGateApiRefContext();
+  const gateApi = gateApiRef.current;
+
+  // useEffect((): void => {
+  //   const { landApi } = gateApiRef.current;
+  //   landApi.loadProcessTree();
+  // }, [gateApiRef, gateApi.landApi.source]);
 
   useEffect((): void => {
-    const gateApi = gateApiRef.current;
-    gateApi.land.loadProcessTree();
-  }, [gateApiRef]);
+    gateApi.landApi.loadProcessTree();
+  }, [gateApi]);
 
   console.log('**** here');
 
