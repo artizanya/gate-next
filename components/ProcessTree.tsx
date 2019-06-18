@@ -15,15 +15,13 @@ import 'react-sortable-tree/style.css';
 function ProcessTree(): JSX.Element {
   console.log('**** here');
 
-  const gate = useGateContext();
+  const [gate] = useGateContext();
 
   // const gate = useStateModel(Gate);
 
   // const [, doUpdate] = useState(now());
   // const update = useCallback((): void => doUpdate(now()), [doUpdate]);
   // const [model] = useState((): GateModel => new GateModel(update));
-
-  // const update: StateModelUpdate = (): void => doUpdate(now());
 
   // const model = useGateModelContext();
   // const api = useGateApiContext();
@@ -39,7 +37,6 @@ function ProcessTree(): JSX.Element {
       <SortableTree
         treeData={gate.model.processTree.treeData}
         onChange={(treeData): void => {
-          console.log('**** bbbbb');
           // api.land.setTreeData(treeData as ProcessTreeData)
           gate.model.processTree.setTreeData(treeData as ProcessTreeData);
         }}

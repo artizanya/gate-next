@@ -29,12 +29,14 @@ export type StateModelUpdate = () => void;
 
 export function useStateModel<Model extends StateModel>(
   Model: StateModelConstructor<Model>,
-): Model {
-  const [, doUpdate] = useState(now());
-  const update: StateModelUpdate =
-    useCallback((): void => doUpdate(now()), [doUpdate]);
+): [Model, StateModelUpdate] {
+  const [, doUpdate] = useState(0);
+  const update: StateModelUpdate = useCallback(
+    (): void => doUpdate(now()),
+    [doUpdate],
+  );
   const [model] = useState((): Model => new Model(update));
-  return model;
+  return [model, update];
 }
 
 export interface StateModelContextProviderProps {
@@ -45,14 +47,15 @@ export function createStateModelContextProvider<
   Model extends StateModel
 >(Model: StateModelConstructor<Model>): [
   (props: StateModelContextProviderProps) => JSX.Element,
-  () => Model,
-  React.Context<Model>
+  () => [Model, StateModelUpdate],
+  React.Context<[Model, StateModelUpdate]>
 ] {
-  const StateModelContext = createContext<Model>(null as unknown as Model);
+  const StateModelContext = createContext<[Model, StateModelUpdate]>(
+    null as unknown as [Model, StateModelUpdate],
+  );
 
   const StateModelContextProvider =
     (props: StateModelContextProviderProps): JSX.Element => {
-      console.log('**** aaaaa');
       const model = useStateModel(Model);
       return (
         <StateModelContext.Provider value={model}>
@@ -61,7 +64,8 @@ export function createStateModelContextProvider<
       );
     };
 
-  const useStateModelContext = (): Model => useContext(StateModelContext);
+  const useStateModelContext =
+    (): [Model, StateModelUpdate] => useContext(StateModelContext);
 
   return [StateModelContextProvider, useStateModelContext, StateModelContext];
 }
