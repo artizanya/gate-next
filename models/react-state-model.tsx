@@ -7,36 +7,50 @@ import React, {
   useContext,
 } from 'react';
 
-import now from 'performance-now';
+export type StateModelUpdate = () => void;
+
+class UpdateCallbackUnallocatedError extends Error {
+  constructor() {
+    super('ProcessTree.setUpdateCallback() must be called ' +
+          'before running any modifying methods.');
+  }
+}
 
 export class StateModel {
-  constructor(update: StateModelUpdate) {
-    this._update = update;
+  update: StateModelUpdate = (): void => {
+    throw new UpdateCallbackUnallocatedError();
+  };
+
+  setUpdate(value: StateModelUpdate): void {
+    console.log('!!!! xxxx here');
   }
 
-  update(): void {
-    this._update();
-  }
-
-  private _update: StateModelUpdate;
+  // setUpdate(value: StateModelUpdate): void {
+  //   console.log('xxxxxxxxxxx');
+  //   this.update = value;
+  //   const properties: StateModel[] = Object.values(this);
+  //   properties.forEach((property): void => {
+  //     if(property instanceof StateModel) {
+  //       property.update = value;
+  //     }
+  //   });
+  // }
 }
 
 interface StateModelConstructor<Model extends StateModel> {
-  new(update: StateModelUpdate): Model;
+  new(): Model;
 }
-
-export type StateModelUpdate = () => void;
 
 export function useStateModel<Model extends StateModel>(
   Model: StateModelConstructor<Model>,
-): [Model, StateModelUpdate] {
-  const [, doUpdate] = useState(0);
+): Model {
+  const [model, setModel] = useState((): Model => new Model());
   const update: StateModelUpdate = useCallback(
-    (): void => doUpdate(now()),
-    [doUpdate],
+    (): void => setModel((prevModel: Model): Model => ({ ...prevModel })),
+    [setModel],
   );
-  const [model] = useState((): Model => new Model(update));
-  return [model, update];
+  useState((): void => model.setUpdate(update));
+  return model;
 }
 
 export interface StateModelContextProviderProps {
@@ -47,12 +61,10 @@ export function createStateModelContextProvider<
   Model extends StateModel
 >(Model: StateModelConstructor<Model>): [
   (props: StateModelContextProviderProps) => JSX.Element,
-  () => [Model, StateModelUpdate],
-  React.Context<[Model, StateModelUpdate]>
+  () => Model,
+  React.Context<Model>
 ] {
-  const StateModelContext = createContext<[Model, StateModelUpdate]>(
-    null as unknown as [Model, StateModelUpdate],
-  );
+  const StateModelContext = createContext<Model>(null as unknown as Model);
 
   const StateModelContextProvider =
     (props: StateModelContextProviderProps): JSX.Element => {
@@ -64,8 +76,7 @@ export function createStateModelContextProvider<
       );
     };
 
-  const useStateModelContext =
-    (): [Model, StateModelUpdate] => useContext(StateModelContext);
+  const useStateModelContext = (): Model => useContext(StateModelContext);
 
   return [StateModelContextProvider, useStateModelContext, StateModelContext];
 }

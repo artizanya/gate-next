@@ -49,8 +49,8 @@ export interface ProcessTreeProcess {
 export type ProcessTreeData = ProcessTreeProcess[];
 
 class ProcessTree extends StateModel {
-  constructor(update: StateModelUpdate) {
-    super(update);
+  constructor() {
+    super();
 
     this._treeData = [{
       collection: 'processes',
@@ -85,18 +85,22 @@ class ProcessTree extends StateModel {
     return this._treeData;
   }
 
+  setUpdate(value: StateModelUpdate): void {
+    this.update = value;
+  }
+
   private _treeData: ProcessTreeData;
 }
 
 export class GateModel extends StateModel {
-  constructor(update: StateModelUpdate) {
-    super(update);
-    this._processTree = new ProcessTree(update);
-  }
-
   get processTree(): ProcessTree {
     return this._processTree;
   }
 
-  private _processTree: ProcessTree;
+  setUpdate(value: StateModelUpdate): void {
+    this.update = value;
+    this.processTree.setUpdate(value);
+  }
+
+  private _processTree: ProcessTree = new ProcessTree();
 }
