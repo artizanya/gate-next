@@ -3,8 +3,8 @@
 import React from 'react';
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
-import { GateModelContextProvider } from '../models/gate';
-import { GateApiContextProvider } from '../models/land-api';
+import { GateContextProvider } from '../models/gate';
+// import { GateApiContextProvider } from '../models/land-api';
 
 class GateApp extends App {
   static async getInitialProps(
@@ -28,11 +28,9 @@ class GateApp extends App {
     const { Component, pageProps } = this.props;
     return (
       <Container>
-        <GateModelContextProvider>
-          <GateApiContextProvider>
-            <Component {...pageProps} />
-          </GateApiContextProvider>
-        </GateModelContextProvider>
+        <GateContextProvider>
+          <Component {...pageProps} />
+        </GateContextProvider>
       </Container>
     );
   }

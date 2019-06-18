@@ -1,10 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import {
-  StateModel,
-  StateModelSetState,
-  createStateModelContextProvider,
-} from './react-state-model';
+import { StateModel, StateModelUpdate } from './react-state-model';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -53,8 +49,8 @@ export interface ProcessTreeProcess {
 export type ProcessTreeData = ProcessTreeProcess[];
 
 class ProcessTree extends StateModel {
-  constructor() {
-    super();
+  constructor(update: StateModelUpdate) {
+    super(update);
 
     this._treeData = [{
       collection: 'processes',
@@ -82,7 +78,7 @@ class ProcessTree extends StateModel {
     shouldUpdate: boolean = true,
   ): void {
     this._treeData = value;
-    if(shouldUpdate) this.updateCallback();
+    if(shouldUpdate) this.update();
   }
 
   get treeData(): ProcessTreeData {
@@ -92,52 +88,15 @@ class ProcessTree extends StateModel {
   private _treeData: ProcessTreeData;
 }
 
-interface GateState {
-  processTree: ProcessTree;
-}
-
-type GateModelSetState = StateModelSetState<GateState>;
-
 export class GateModel extends StateModel {
-  static get initialState(): GateState {
-    const processTree = new ProcessTree();
-
-    return {
-      processTree,
-    };
-  }
-
-  constructor(state: GateState, setState: GateModelSetState) {
-    super();
-
-    this._state = state;
-    this._setState = setState;
-
-    // const stateProperties: StateModel[] = Object.values(this._state);
-    // stateProperties.forEach((stateProperty): void => {
-    //   stateProperty.updateCallback = this.updateCallback;
-    // });
-    this._state.processTree.updateCallback = this.updateCallback;
+  constructor(update: StateModelUpdate) {
+    super(update);
+    this._processTree = new ProcessTree(update);
   }
 
   get processTree(): ProcessTree {
-    return this._state.processTree;
+    return this._processTree;
   }
 
-  updateCallback = (): void => {
-    this._setState({ ...this._state });
-  }
-
-  private _state: GateState;
-  private _setState: GateModelSetState;
+  private _processTree: ProcessTree;
 }
-
-const [
-  GateModelContextProvider,
-  useGateModelContext,
-] = createStateModelContextProvider(GateModel);
-
-export {
-  GateModelContextProvider,
-  useGateModelContext,
-};

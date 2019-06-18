@@ -1,38 +1,40 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import React, { useState, createContext, useContext } from 'react';
+import React, {
+  useState,
+  useCallback,
+  createContext,
+  useContext,
+} from 'react';
 
-export type StateModelUpdateCallback = () => void;
-
-class UpdateCallbackUnallocatedError extends Error {
-  constructor() {
-    super('ProcessTree.setUpdateCallback() must be called ' +
-          'before running any modifying methods.');
-  }
-}
+import now from 'performance-now';
 
 export class StateModel {
-  updateCallback = (): void => {
-    throw new UpdateCallbackUnallocatedError();
-  };
+  constructor(update: StateModelUpdate) {
+    this._update = update;
+  }
+
+  update(): void {
+    this._update();
+  }
+
+  private _update: StateModelUpdate;
 }
 
-interface StateModelConstructor<State, Model extends StateModel> {
-  initialState: State;
-  new(
-    state: State,
-    setState: React.Dispatch<React.SetStateAction<State>>
-  ): Model;
+interface StateModelConstructor<Model extends StateModel> {
+  new(update: StateModelUpdate): Model;
 }
 
-export type StateModelSetState<State> =
-  React.Dispatch<React.SetStateAction<State>>;
+export type StateModelUpdate = () => void;
 
-export function useStateModel<
-  State, Model extends StateModel
->(Model: StateModelConstructor<State, Model>): Model {
-  const [state, setState] = useState(Model.initialState);
-  return new Model(state, setState);
+export function useStateModel<Model extends StateModel>(
+  Model: StateModelConstructor<Model>,
+): Model {
+  const [, doUpdate] = useState(now());
+  const update: StateModelUpdate =
+    useCallback((): void => doUpdate(now()), [doUpdate]);
+  const [model] = useState((): Model => new Model(update));
+  return model;
 }
 
 export interface StateModelContextProviderProps {
@@ -40,8 +42,8 @@ export interface StateModelContextProviderProps {
 }
 
 export function createStateModelContextProvider<
-  State, Model extends StateModel
->(Model: StateModelConstructor<State, Model>): [
+  Model extends StateModel
+>(Model: StateModelConstructor<Model>): [
   (props: StateModelContextProviderProps) => JSX.Element,
   () => Model,
   React.Context<Model>
@@ -50,9 +52,10 @@ export function createStateModelContextProvider<
 
   const StateModelContextProvider =
     (props: StateModelContextProviderProps): JSX.Element => {
-      const stateModel = useStateModel(Model);
+      console.log('**** aaaaa');
+      const model = useStateModel(Model);
       return (
-        <StateModelContext.Provider value={stateModel}>
+        <StateModelContext.Provider value={model}>
           {props.children}
         </StateModelContext.Provider>
       );

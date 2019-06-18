@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react';
 import fetch from 'isomorphic-unfetch';
 import {
   ProcessTreeData,
-  GateModel,
+  GateStore,
   useGateModelContext,
   ProcessTreeProcess,
 } from './gate';
@@ -28,7 +28,7 @@ type LandSourceSetState =
 
 class LandApi {
   constructor(
-    gateModel: GateModel,
+    gateModel: GateStore,
     sourceState: LandSourceState,
     sourceSetState: LandSourceSetState,
   ) {
@@ -151,14 +151,14 @@ class LandApi {
     this.source = new LandSource(uri);
   }
 
-  private _gateModel: GateModel;
+  private _gateModel: GateStore;
   private _sourceState: LandSourceState;
   private _sourceSetState: LandSourceSetState;
 }
 
 export class GateApi {
   constructor(
-    gateModel: GateModel,
+    gateModel: GateStore,
     sourceState: LandSourceState,
     sourceSetState: LandSourceSetState,
   ) {
@@ -166,7 +166,7 @@ export class GateApi {
     this._landApi = new LandApi(gateModel, sourceState, sourceSetState);
   }
 
-  get model(): GateModel {
+  get model(): GateStore {
     return this._model;
   }
 
@@ -174,7 +174,7 @@ export class GateApi {
     return this._landApi;
   }
 
-  private _model: GateModel;
+  private _model: GateStore;
   private _landApi: LandApi;
 }
 
