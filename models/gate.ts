@@ -6,7 +6,7 @@ import {
   createStateModelContextProvider,
 } from './react-state-model';
 
-import { GateModel } from './gate-model';
+import { GateStore } from './gate-store';
 
 // export type StateModelSetState<Model> =
 //   React.Dispatch<React.SetStateAction<Model>>;
@@ -18,7 +18,7 @@ export default class Gate extends StateModel {
     console.log('!!!! here');
   }
 
-  get store(): GateModel {
+  get store(): GateStore {
     return this._store;
   }
 
@@ -29,7 +29,7 @@ export default class Gate extends StateModel {
     this.store.setUpdate(value);
   }
 
-  private _store: GateModel = new GateModel();
+  private _store: GateStore = new GateStore();
 }
 
 const [

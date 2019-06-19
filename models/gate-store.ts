@@ -92,7 +92,7 @@ class ProcessTree extends StateModel {
   private _treeData: ProcessTreeData;
 }
 
-export class GateModel extends StateModel {
+export class GateStore extends StateModel {
   get processTree(): ProcessTree {
     return this._processTree;
   }
@@ -102,5 +102,5 @@ export class GateModel extends StateModel {
     this.processTree.setUpdate(value);
   }
 
-  private _processTree: ProcessTree = new ProcessTree();
+  private _processTree = new ProcessTree();
 }
