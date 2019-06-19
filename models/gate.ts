@@ -2,7 +2,7 @@
 
 import {
   StateModel,
-  createStateModelContextProvider,
+  createStateModelRefContextProvider,
 } from './react-state-model';
 
 import { GateStore } from './gate-store';
@@ -22,11 +22,11 @@ export default class Gate extends StateModel {
 }
 
 const [
-  GateContextProvider,
-  useGateContext,
-] = createStateModelContextProvider(Gate);
+  GateRefContextProvider,
+  useGateRefContext,
+] = createStateModelRefContextProvider(Gate);
 
 export {
-  GateContextProvider,
-  useGateContext,
+  GateRefContextProvider,
+  useGateRefContext,
 };

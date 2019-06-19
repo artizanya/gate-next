@@ -8,7 +8,7 @@ import SortableTree from 'react-sortable-tree';
 // import { useGateApiContext } from '../models/land-api';
 // import { useStateModel } from '../models/react-state-model';
 import { ProcessTreeData } from '../models/gate-store';
-import { useGateContext } from '../models/gate';
+import { useGateRefContext } from '../models/gate';
 
 import 'react-sortable-tree/style.css';
 
@@ -19,7 +19,7 @@ import 'react-sortable-tree/style.css';
 function ProcessTree(): JSX.Element {
   console.log('**** here');
 
-  const gate = useGateContext();
+  const { model: gate } = useGateRefContext();
   // const gate = useStateModel(Gate);
 
   return (

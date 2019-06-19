@@ -30,78 +30,62 @@ export class StateModel {
   }
 }
 
+interface Ref<Model extends StateModel> {
+  model: Model;
+}
+
 interface StateModelConstructor<Model extends StateModel> {
   new(): Model;
 }
 
-export function useStateModel<Model extends StateModel>(
-  Model: StateModelConstructor<Model>,
-): Model {
-  const [model, setModel] = useState((): Model => new Model());
-
-  const update: () => void = useCallback(
-    // see http://2ality.com/2016/10/rest-spread-properties.html
-
-    // Not sure what way is the best:
-    // __proto__ is deprecated in new JS environments;
-    // Object.assign() calls object setters as a side effect;
-    // Object.setPrototypeOf() is said to be slow.
-
-    // (): void => setModel(
-    //   (prev: Model): Model => Object.assign(
-    //     { __proto__: prev.__proto__ }, prev
-    //   ),
-    // ),
-
-    // (): void => setModel(
-    //   (prev: Model): Model => (
-    //     { __proto__: Object.getPrototypeOf(prev), ...prev }
-    //   )
-    // ),
-
-    // (): void => setModel(
-    //   (prev: Model): Model => (
-    //     Object.assign(Object.create(Object.getPrototypeOf(prev)), prev)
-    //   ),
-    // ),
-
-    (): void => setModel(
-      (prev: Model): Model => (
-        Object.setPrototypeOf({ ...prev }, Object.getPrototypeOf(prev))
-      ),
-    ),
-    [setModel],
+export function useStateModelRef<Model extends StateModel>(
+  ModelClass: StateModelConstructor<Model>,
+): Ref<Model> {
+  const [modelRef, setModelRef] = useState(
+    (): Ref<Model> => ({ model: new ModelClass() }),
   );
 
-  useState((): void => model.setUpdate(update));
+  const update: () => void = useCallback(
+    (): void => setModelRef(
+      (prevRef: Ref<Model>): Ref<Model> => ({ model: prevRef.model }),
+    ),
+    [setModelRef],
+  );
 
-  return model;
+  useState((): void => modelRef.model.setUpdate(update));
+
+  return modelRef;
 }
 
 export interface StateModelContextProviderProps {
   children?: React.ReactNode;
 }
 
-export function createStateModelContextProvider<
+export function createStateModelRefContextProvider<
   Model extends StateModel
->(Model: StateModelConstructor<Model>): [
+>(ModelClass: StateModelConstructor<Model>): [
   (props: StateModelContextProviderProps) => JSX.Element,
-  () => Model,
-  React.Context<Model>
+  () => Ref<Model>,
+  React.Context<Ref<Model>>
 ] {
-  const StateModelContext = createContext<Model>(null as unknown as Model);
+  const StateModelRefContext =
+    createContext<Ref<Model>>(null as unknown as Ref<Model>);
 
-  const StateModelContextProvider =
+  const StateModelRefContextProvider =
     (props: StateModelContextProviderProps): JSX.Element => {
-      const model = useStateModel(Model);
+      const modelRef = useStateModelRef(ModelClass);
       return (
-        <StateModelContext.Provider value={model}>
+        <StateModelRefContext.Provider value={modelRef}>
           {props.children}
-        </StateModelContext.Provider>
+        </StateModelRefContext.Provider>
       );
     };
 
-  const useStateModelContext = (): Model => useContext(StateModelContext);
+  const useStateModelRefContext = (): Ref<Model> => useContext(StateModelRefContext);
 
-  return [StateModelContextProvider, useStateModelContext, StateModelContext];
+  return [
+    StateModelRefContextProvider,
+    useStateModelRefContext,
+    StateModelRefContext,
+  ];
 }
