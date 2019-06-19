@@ -1,6 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import { StateModel } from './react-state-model';
+import { Model } from './use-model';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -48,7 +48,7 @@ export interface ProcessTreeProcess {
 // export type ProcessTreeData = ProcessTreeItem[];
 export type ProcessTreeData = ProcessTreeProcess[];
 
-class ProcessTree extends StateModel {
+class ProcessTree extends Model {
   constructor() {
     super();
 
@@ -88,7 +88,7 @@ class ProcessTree extends StateModel {
   private _treeData: ProcessTreeData;
 }
 
-export class GateStore extends StateModel {
+export class GateStore extends Model {
   get processTree(): ProcessTree {
     return this._processTree;
   }

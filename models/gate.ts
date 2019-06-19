@@ -1,13 +1,13 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
 import {
-  StateModel,
-  createStateModelRefContextProvider,
-} from './react-state-model';
+  Model,
+  createModelRefContextProvider,
+} from './use-model';
 
 import { GateStore } from './gate-store';
 
-export default class Gate extends StateModel {
+export default class Gate extends Model {
   constructor() {
     super();
 
@@ -24,7 +24,7 @@ export default class Gate extends StateModel {
 const [
   GateRefContextProvider,
   useGateRefContext,
-] = createStateModelRefContextProvider(Gate);
+] = createModelRefContextProvider(Gate);
 
 export {
   GateRefContextProvider,
