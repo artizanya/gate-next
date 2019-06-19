@@ -30,24 +30,24 @@ export class StateModel {
   }
 }
 
-interface Ref<Model extends StateModel> {
-  model: Model;
+interface Ref<M extends StateModel> {
+  model: M;
 }
 
-interface StateModelConstructor<Model extends StateModel> {
-  new(): Model;
+interface StateModelConstructor<M extends StateModel> {
+  new(): M;
 }
 
-export function useStateModelRef<Model extends StateModel>(
-  ModelClass: StateModelConstructor<Model>,
-): Ref<Model> {
+export function useStateModelRef<M extends StateModel>(
+  ModelClass: StateModelConstructor<M>,
+): Ref<M> {
   const [modelRef, setModelRef] = useState(
-    (): Ref<Model> => ({ model: new ModelClass() }),
+    (): Ref<M> => ({ model: new ModelClass() }),
   );
 
   const update: () => void = useCallback(
     (): void => setModelRef(
-      (prevRef: Ref<Model>): Ref<Model> => ({ model: prevRef.model }),
+      (prevRef: Ref<M>): Ref<M> => ({ model: prevRef.model }),
     ),
     [setModelRef],
   );
@@ -62,14 +62,14 @@ export interface StateModelContextProviderProps {
 }
 
 export function createStateModelRefContextProvider<
-  Model extends StateModel
->(ModelClass: StateModelConstructor<Model>): [
+  M extends StateModel
+>(ModelClass: StateModelConstructor<M>): [
   (props: StateModelContextProviderProps) => JSX.Element,
-  () => Ref<Model>,
-  React.Context<Ref<Model>>
+  () => Ref<M>,
+  React.Context<Ref<M>>
 ] {
   const StateModelRefContext =
-    createContext<Ref<Model>>(null as unknown as Ref<Model>);
+    createContext<Ref<M>>(null as unknown as Ref<M>);
 
   const StateModelRefContextProvider =
     (props: StateModelContextProviderProps): JSX.Element => {
@@ -81,7 +81,7 @@ export function createStateModelRefContextProvider<
       );
     };
 
-  const useStateModelRefContext = (): Ref<Model> => useContext(StateModelRefContext);
+  const useStateModelRefContext = (): Ref<M> => useContext(StateModelRefContext);
 
   return [
     StateModelRefContextProvider,
