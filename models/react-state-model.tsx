@@ -38,11 +38,43 @@ export function useStateModel<Model extends StateModel>(
   Model: StateModelConstructor<Model>,
 ): Model {
   const [model, setModel] = useState((): Model => new Model());
-  const update: StateModelUpdate = useCallback(
-    (): void => setModel((prevModel: Model): Model => ({ ...prevModel })),
+
+  const update: () => void = useCallback(
+    // see http://2ality.com/2016/10/rest-spread-properties.html
+
+    // Not sure what way is the best:
+    // __proto__ is deprecated in new JS environments;
+    // Object.assign() calls object setters as a side effect;
+    // Object.setPrototypeOf() is said to be slow.
+
+    // (): void => setModel(
+    //   (prev: Model): Model => Object.assign(
+    //     { __proto__: prev.__proto__ }, prev
+    //   ),
+    // ),
+
+    // (): void => setModel(
+    //   (prev: Model): Model => (
+    //     { __proto__: Object.getPrototypeOf(prev), ...prev }
+    //   )
+    // ),
+
+    // (): void => setModel(
+    //   (prev: Model): Model => (
+    //     Object.assign(Object.create(Object.getPrototypeOf(prev)), prev)
+    //   ),
+    // ),
+
+    (): void => setModel(
+      (prev: Model): Model => (
+        Object.setPrototypeOf({ ...prev }, Object.getPrototypeOf(prev))
+      ),
+    ),
     [setModel],
   );
+
   useState((): void => model.setUpdate(update));
+
   return model;
 }
 

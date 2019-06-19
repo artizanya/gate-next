@@ -3,7 +3,7 @@
 import React from 'react';
 import App, { Container, NextAppContext, DefaultAppIProps } from 'next/app';
 
-// import { GateContextProvider } from '../models/gate';
+import { GateContextProvider } from '../models/gate';
 // import { GateApiContextProvider } from '../models/land-api';
 
 class GateApp extends App {
@@ -29,7 +29,9 @@ class GateApp extends App {
     const { Component, pageProps } = this.props;
     return (
       <Container>
-        <Component {...pageProps} />
+        <GateContextProvider>
+          <Component {...pageProps} />
+        </GateContextProvider>
       </Container>
     );
   }
