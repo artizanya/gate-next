@@ -1,6 +1,6 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
-import { StateModel, StateModelUpdate } from './react-state-model';
+import { StateModel } from './react-state-model';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -75,7 +75,7 @@ class ProcessTree extends StateModel {
 
   setTreeData(
     value: ProcessTreeData,
-    shouldUpdate: boolean = true,
+    shouldUpdate = true,
   ): void {
     this._treeData = value;
     if(shouldUpdate) this.update();
@@ -85,21 +85,12 @@ class ProcessTree extends StateModel {
     return this._treeData;
   }
 
-  setUpdate(value: StateModelUpdate): void {
-    this.update = value;
-  }
-
   private _treeData: ProcessTreeData;
 }
 
 export class GateStore extends StateModel {
   get processTree(): ProcessTree {
     return this._processTree;
-  }
-
-  setUpdate(value: StateModelUpdate): void {
-    this.update = value;
-    this.processTree.setUpdate(value);
   }
 
   private _processTree = new ProcessTree();

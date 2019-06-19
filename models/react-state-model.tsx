@@ -22,19 +22,12 @@ export class StateModel {
   };
 
   setUpdate(value: StateModelUpdate): void {
-    console.log('!!!! xxxx here');
+    this.update = value;
+    const properties: StateModel[] = Object.values(this);
+    properties.forEach((property): void => {
+      if(property instanceof StateModel) property.setUpdate(value);
+    });
   }
-
-  // setUpdate(value: StateModelUpdate): void {
-  //   console.log('xxxxxxxxxxx');
-  //   this.update = value;
-  //   const properties: StateModel[] = Object.values(this);
-  //   properties.forEach((property): void => {
-  //     if(property instanceof StateModel) {
-  //       property.update = value;
-  //     }
-  //   });
-  // }
 }
 
 interface StateModelConstructor<Model extends StateModel> {
