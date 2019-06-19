@@ -88,7 +88,7 @@ class ProcessTree extends Model {
   private _treeData: ProcessTreeData;
 }
 
-export class GateStore extends Model {
+export default class GateStore extends Model {
   get processTree(): ProcessTree {
     return this._processTree;
   }
