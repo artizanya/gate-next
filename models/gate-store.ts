@@ -48,6 +48,31 @@ export interface ProcessTreeProcess {
 // export type ProcessTreeData = ProcessTreeItem[];
 export type ProcessTreeData = ProcessTreeProcess[];
 
+// type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+class Action<
+  Run extends Function,
+  Undo extends (runArgs: ArgsType<Run>, runReturn?: ReturnType<Run>) => void,
+> {
+  constructor(run: Run, undo: Undo) {
+    this._run = run;
+    this._undo = undo;
+  }
+
+  run(...args: ArgsType<Run>): ReturnType<Run> {
+    return this._run(...args);
+  }
+
+  undo(runArgs: ArgsType<Run>, runReturn?: ReturnType<Run>): void {
+    this._undo(runArgs, runReturn);
+  }
+
+  private _run: Run;
+  private _undo: Undo;
+}
+
 class ProcessTree extends Model {
   constructor() {
     super();
