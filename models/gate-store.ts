@@ -83,13 +83,17 @@ class Action<
   }
 
   done(): void {
-    this._revert = null;
+    if(this._revert) {
+      this._revert = null;
+      this._update();
+    }
   }
 
   revert(): void {
     if(this._revert) {
       this._revert();
       this._revert = null;
+      this._update();
     }
   }
 
