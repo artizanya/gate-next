@@ -49,28 +49,57 @@ export interface ProcessTreeProcess {
 export type ProcessTreeData = ProcessTreeProcess[];
 
 // type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+// type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
-type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+type Update = () => void;
+type Revert = (() => void) | null;
 
 class Action<
-  Run extends Function,
-  Undo extends (runArgs: ArgsType<Run>, runReturn?: ReturnType<Run>) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Run extends (...args: any[]) => void,
 > {
-  constructor(run: Run, undo: Undo) {
+  constructor(update: Update, run: Run) {
+    this._update = update;
     this._run = run;
-    this._undo = undo;
+    this._revert = null;
   }
 
-  run(...args: ArgsType<Run>): ReturnType<Run> {
-    return this._run(...args);
+  run(...args: ArgsType<Run>): void {
+    this._run(...args);
+    this._update();
+    this.done();
   }
 
-  undo(runArgs: ArgsType<Run>, runReturn?: ReturnType<Run>): void {
-    this._undo(runArgs, runReturn);
+  apply(
+    args: ArgsType<Run>,
+    shouldUpdate: boolean = true,
+    revert: Revert = null,
+  ): void {
+    this._revert = revert;
+    this._run(...args);
+    if(shouldUpdate) this._update();
   }
 
+  done(): void {
+    this._revert = null;
+  }
+
+  revert(): void {
+    if(this._revert) {
+      this._revert();
+      this._revert = null;
+    }
+  }
+
+  update(): void {
+    this._update();
+  }
+
+  private _update: Update;
   private _run: Run;
-  private _undo: Undo;
+  private _revert: Revert;
 }
 
 class ProcessTree extends Model {
