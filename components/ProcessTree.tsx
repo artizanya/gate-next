@@ -28,7 +28,7 @@ function ProcessTree(): JSX.Element {
         treeData={gate.store.processTree.treeData}
         onChange={(treeData): void => {
           // api.land.setTreeData(treeData as ProcessTreeData)
-          gate.store.processTree.setTreeData(treeData as ProcessTreeData);
+          gate.store.processTree.setTreeData.run(treeData as ProcessTreeData);
         }}
       />
     </div>
