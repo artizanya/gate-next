@@ -51,44 +51,86 @@ export type ProcessTreeData = ProcessTreeProcess[];
 // type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
 // type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
+type JsonAny = boolean | number | string | null | JsonArray | JsonMap;
+interface JsonMap { [key: string]: JsonAny }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface JsonArray extends Array<JsonAny> {}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
-type Revert = (() => void) | null;
+// type Delta = JsonAny | null;
+// type Apply = (delta: Delta) => void;
+// type Revert = (delta: Delta) => void;
 
 class Action<
+  Delta extends JsonAny,
+  Apply extends ((delta: Delta | null) => void),
+  Revert extends ((delta: Delta | null) => void),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Run extends (...args: any[]) => Revert,
+  Run extends (...args: any[]) => Delta,
 > {
-  constructor(model: Model, run: Run) {
+  constructor(
+    model: Model,
+    optimistic: boolean,
+    run: Run,
+    apply: Apply,
+    revert: Revert,
+  ) {
     this._model = model;
+    this._optimistic = optimistic;
     this._run = run;
-    this._revert = null;
+    this._apply = apply;
+    this._revert = revert;
+    this._delta = null;
   }
 
   run(...args: ArgsType<Run>): void {
-    this._run(...args);
-    this._model.update();
-    this._revert = null;
+    this._delta = this._run(...args);
+    this.update();
   }
 
-  apply(
-    args: ArgsType<Run>,
-    shouldUpdate: boolean = true,
-  ): void {
-    this._revert = this._run(...args);
-    if(shouldUpdate) this._model.update();
+  cancel(): void {
+    this._revert(this._delta);
+    this._delta = null;
+    this.update();
   }
 
   done(): void {
-    if(this._revert) this._revert = null;
+    this._delta = null;
+    this.update();
   }
 
-  revert(): void {
-    if(this._revert) {
-      this._revert();
-      this._revert = null;
-      this._model.update();
+  get optimistic(): boolean {
+    return this._optimistic;
+  }
+
+  act(
+    args: ArgsType<Run>,
+    shouldUpdate: boolean = false,
+    optimistic: boolean = false,
+  ): void {
+    if(optimistic) {
+      this._delta = null;
+      this._run(...args);
     }
+    else this._delta = this._run(...args);
+    if(shouldUpdate) this.update();
+  }
+
+  apply(
+    delta: Delta,
+    shouldUpdate: boolean = true,
+  ): void {
+    this._apply(delta);
+    if(shouldUpdate) this._model.update();
+  }
+
+  revert(
+    delta: Delta,
+    shouldUpdate: boolean = true,
+  ): void {
+    this._revert(delta);
+    if(shouldUpdate) this._model.update();
   }
 
   update(): void {
@@ -96,7 +138,10 @@ class Action<
   }
 
   private _model: Model;
+  private _optimistic: boolean;
+  private _delta: Delta | null;
   private _run: Run;
+  private _apply: Apply;
   private _revert: Revert;
 }
 
@@ -134,7 +179,7 @@ class ProcessTree extends Model {
   // }
 
   setTreeData = new Action(
-    this,
+    this, false,
     (value: ProcessTreeData): Revert => {
       const prev = value;
       this._treeData = value;
