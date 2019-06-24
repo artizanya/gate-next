@@ -1,7 +1,8 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
+import { diff, Diff } from 'deep-diff';
+
 import { Model } from './use-model';
-import cloneDeepfrom from 'lodash.clonedeep';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -50,29 +51,18 @@ export interface ProcessTreeProcess {
 export type ProcessTreeData = ProcessTreeProcess[];
 
 // type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
-// type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-
-type JsonAny = boolean | number | string | null | JsonArray | JsonMap;
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface JsonArray extends Array<JsonAny> {}
-interface JsonMap { [key: string]: JsonAny }
-
-// type JsonPrimitive = string | number | boolean | null;
-// type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-// type JsonObject = { [member: string]: JsonValue };
-// interface JsonArray extends Array<JsonValue> {}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
-// type Delta = JsonAny | null;
-// type Apply = (delta: Delta) => void;
-// type Revert = (delta: Delta) => void;
 
 class Action<
-  Apply extends ((delta: JsonAny) => void),
-  Revert extends ((delta: JsonAny) => void),
+  Delta,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Run extends (...args: any[]) => JsonAny,
+  Run extends (...args: any[]) => Delta | null,
+  Apply extends (delta: ReturnType<Run> | null) => void,
+  Revert extends (delta: ReturnType<Run> | null) => void,
 > {
   constructor(
     model: Model,
@@ -95,14 +85,18 @@ class Action<
   }
 
   cancel(): void {
-    this._revert(this._delta);
-    this._delta = null;
-    this.update();
+    if(this._delta) {
+      this._revert(this._delta);
+      this._delta = null;
+      this.update();
+    }
   }
 
   done(): void {
-    this._delta = null;
-    this.update();
+    if(this._delta) {
+      this._delta = null;
+      this.update();
+    }
   }
 
   get optimistic(): boolean {
@@ -114,16 +108,16 @@ class Action<
     shouldUpdate: boolean = false,
     optimistic: boolean = false,
   ): void {
-    if(optimistic) {
+    if(optimistic) this._delta = this._run(...args);
+    else {
       this._delta = null;
       this._run(...args);
     }
-    else this._delta = this._run(...args);
     if(shouldUpdate) this.update();
   }
 
   apply(
-    delta: JsonAny,
+    delta: ReturnType<Run>,
     shouldUpdate: boolean = true,
   ): void {
     this._apply(delta);
@@ -131,7 +125,7 @@ class Action<
   }
 
   revert(
-    delta: JsonAny,
+    delta: ReturnType<Run>,
     shouldUpdate: boolean = true,
   ): void {
     this._revert(delta);
@@ -144,11 +138,13 @@ class Action<
 
   private _model: Model;
   private _optimistic: boolean;
-  private _delta: JsonAny | null;
+  private _delta: ReturnType<Run> | null;
   private _run: Run;
   private _apply: Apply;
   private _revert: Revert;
 }
+
+type ProcessTreeDataDiff = Diff<ProcessTreeData>[];
 
 class ProcessTree extends Model {
   constructor() {
@@ -185,15 +181,16 @@ class ProcessTree extends Model {
 
   setTreeData = new Action(
     this, false,
-    (value: ProcessTreeData): JsonAny => {
-      const prev = cloneDeepfrom(this._treeData) as unknown as JsonAny;
+    (value: ProcessTreeData): ProcessTreeDataDiff | null => {
+      const delta = diff(this._treeData, value);
       this._treeData = value;
-      return prev;
+      if(delta) return delta;
+      return null;
     },
-    (delta: JsonAny): void => {
+    (delta: ProcessTreeDataDiff | null): void => {
       this._treeData = delta as unknown as ProcessTreeData;
     },
-    (delta: JsonAny): void => {
+    (delta: ProcessTreeDataDiff | null): void => {
       this._treeData = delta as unknown as ProcessTreeData;
     },
   );
