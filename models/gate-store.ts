@@ -1,6 +1,7 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
 import { Model } from './use-model';
+import cloneDeepfrom from 'lodash.clonedeep';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -52,9 +53,14 @@ export type ProcessTreeData = ProcessTreeProcess[];
 // type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
 type JsonAny = boolean | number | string | null | JsonArray | JsonMap;
-interface JsonMap { [key: string]: JsonAny }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface JsonArray extends Array<JsonAny> {}
+interface JsonMap { [key: string]: JsonAny }
+
+// type JsonPrimitive = string | number | boolean | null;
+// type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+// type JsonObject = { [member: string]: JsonValue };
+// interface JsonArray extends Array<JsonValue> {}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
@@ -63,11 +69,10 @@ type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
 // type Revert = (delta: Delta) => void;
 
 class Action<
-  Delta extends JsonAny,
-  Apply extends ((delta: Delta | null) => void),
-  Revert extends ((delta: Delta | null) => void),
+  Apply extends ((delta: JsonAny) => void),
+  Revert extends ((delta: JsonAny) => void),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Run extends (...args: any[]) => Delta,
+  Run extends (...args: any[]) => JsonAny,
 > {
   constructor(
     model: Model,
@@ -118,7 +123,7 @@ class Action<
   }
 
   apply(
-    delta: Delta,
+    delta: JsonAny,
     shouldUpdate: boolean = true,
   ): void {
     this._apply(delta);
@@ -126,7 +131,7 @@ class Action<
   }
 
   revert(
-    delta: Delta,
+    delta: JsonAny,
     shouldUpdate: boolean = true,
   ): void {
     this._revert(delta);
@@ -139,7 +144,7 @@ class Action<
 
   private _model: Model;
   private _optimistic: boolean;
-  private _delta: Delta | null;
+  private _delta: JsonAny | null;
   private _run: Run;
   private _apply: Apply;
   private _revert: Revert;
@@ -180,13 +185,16 @@ class ProcessTree extends Model {
 
   setTreeData = new Action(
     this, false,
-    (value: ProcessTreeData): Revert => {
-      const prev = value;
+    (value: ProcessTreeData): JsonAny => {
+      const prev = cloneDeepfrom(this._treeData) as unknown as JsonAny;
       this._treeData = value;
-
-      return (): void => {
-        this._treeData = prev;
-      };
+      return prev;
+    },
+    (delta: JsonAny): void => {
+      this._treeData = delta as unknown as ProcessTreeData;
+    },
+    (delta: JsonAny): void => {
+      this._treeData = delta as unknown as ProcessTreeData;
     },
   );
 
