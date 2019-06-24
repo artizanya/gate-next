@@ -47,22 +47,18 @@ export interface ProcessTreeProcess {
 //   children?: ProcessTreeItem[];
 // }
 
-// export type ProcessTreeData = ProcessTreeItem[];
 export type ProcessTreeData = ProcessTreeProcess[];
 
-// type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
 
 class Action<
-  Delta,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Run extends (...args: any[]) => Delta | null,
-  Apply extends (delta: ReturnType<Run> | null) => void,
-  Revert extends (delta: ReturnType<Run> | null) => void,
+  Run extends (...args: any[]) => any,
+  Apply extends (delta: ReturnType<Run>) => void,
+  Revert extends (delta: ReturnType<Run>) => void,
 > {
   constructor(
     model: Model,
@@ -144,7 +140,7 @@ class Action<
   private _revert: Revert;
 }
 
-type ProcessTreeDataDiff = Diff<ProcessTreeData>[];
+type ProcessTreeDataDiff = Diff<ProcessTreeData>[] | null;
 
 class ProcessTree extends Model {
   constructor() {
@@ -181,16 +177,16 @@ class ProcessTree extends Model {
 
   setTreeData = new Action(
     this, false,
-    (value: ProcessTreeData): ProcessTreeDataDiff | null => {
+    (value: ProcessTreeData): ProcessTreeDataDiff => {
       const delta = diff(this._treeData, value);
       this._treeData = value;
       if(delta) return delta;
       return null;
     },
-    (delta: ProcessTreeDataDiff | null): void => {
+    (delta: ProcessTreeDataDiff): void => {
       this._treeData = delta as unknown as ProcessTreeData;
     },
-    (delta: ProcessTreeDataDiff | null): void => {
+    (delta: ProcessTreeDataDiff): void => {
       this._treeData = delta as unknown as ProcessTreeData;
     },
   );
