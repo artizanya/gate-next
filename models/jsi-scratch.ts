@@ -54,3 +54,39 @@ function add(a: number, b: number) {
 add(1, 2);
 
 add('a', 'b');
+
+// ------------------------
+
+import { diff } from 'deep-diff';
+
+interface Test {
+  name: string;
+  description: string;
+  details: {
+    it: string;
+    an: string;
+    with: (string | { than: string })[];
+  };
+}
+
+const lhs: Test = {
+  name: 'my object',
+  description: 'it\'s an object!',
+  details: {
+    it: 'has',
+    an: 'array',
+    with: ['a', 'few', 'elements'],
+  },
+};
+
+const rhs: Test = {
+  name: 'updated object',
+  description: 'it\'s an object!',
+  details: {
+    it: 'has',
+    an: 'array',
+    with: ['a', 'few', 'more', 'elements', { than: 'before' }],
+  },
+};
+
+const differences = diff(lhs, rhs);
