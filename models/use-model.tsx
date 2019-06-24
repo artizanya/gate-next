@@ -17,17 +17,21 @@ class UpdateUnallocatedError extends Error {
 }
 
 export class Model {
-  update: ModelUpdate = (): void => {
-    throw new UpdateUnallocatedError();
-  };
+  get update(): ModelUpdate {
+    return this._update;
+  }
 
   setUpdate(value: ModelUpdate): void {
-    this.update = value;
+    this._update = value;
     const properties: Model[] = Object.values(this);
     properties.forEach((property): void => {
       if(property instanceof Model) property.setUpdate(value);
     });
   }
+
+  private _update: ModelUpdate = (): void => {
+    throw new UpdateUnallocatedError();
+  };
 }
 
 interface Ref<M extends Model> {

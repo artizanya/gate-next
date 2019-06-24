@@ -55,19 +55,22 @@ type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
 
 class Action<
+  Data,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Run extends (...args: any[]) => any,
   Apply extends (delta: ReturnType<Run>) => void,
   Revert extends (delta: ReturnType<Run>) => void,
 > {
   constructor(
-    model: Model,
+    data: Data,
+    update: () => void,
     optimistic: boolean,
     run: Run,
     apply: Apply,
     revert: Revert,
   ) {
-    this._model = model;
+    this._data = data;
+    this._update = update;
     this._optimistic = optimistic;
     this._run = run;
     this._apply = apply;
@@ -117,7 +120,7 @@ class Action<
     shouldUpdate: boolean = true,
   ): void {
     this._apply(delta);
-    if(shouldUpdate) this._model.update();
+    if(shouldUpdate) this.update();
   }
 
   revert(
@@ -125,14 +128,15 @@ class Action<
     shouldUpdate: boolean = true,
   ): void {
     this._revert(delta);
-    if(shouldUpdate) this._model.update();
+    if(shouldUpdate) this.update();
   }
 
   update(): void {
-    this._model.update();
+    this.update();
   }
 
-  private _model: Model;
+  private _data: Data;
+  private _update: () => void;
   private _optimistic: boolean;
   private _delta: ReturnType<Run> | null;
   private _run: Run;
@@ -176,7 +180,7 @@ class ProcessTree extends Model {
   // }
 
   setTreeData = new Action(
-    this, false,
+    this.treeData, this.update, false,
     (value: ProcessTreeData): ProcessTreeDataDiff => {
       const delta = diff(this._treeData, value);
       this._treeData = value;
