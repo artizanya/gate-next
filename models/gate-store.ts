@@ -1,6 +1,5 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
-
-import { diff, Diff } from 'deep-diff';
+import * as dd from 'deep-diff';
 
 import { Model } from './use-model';
 
@@ -55,23 +54,18 @@ type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
 
 class Action<
-  Data,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Run extends (...args: any[]) => any,
   Apply extends (delta: ReturnType<Run>) => void,
   Revert extends (delta: ReturnType<Run>) => void,
 > {
   constructor(
-    data: Data,
-    update: () => void,
-    optimistic: boolean,
+    model: Model,
     run: Run,
     apply: Apply,
     revert: Revert,
   ) {
-    this._data = data;
-    this._update = update;
-    this._optimistic = optimistic;
+    this._model = model;
     this._run = run;
     this._apply = apply;
     this._revert = revert;
@@ -83,6 +77,10 @@ class Action<
     this.update();
   }
 
+  batch(...args: ArgsType<Run>): void {
+    this._delta = this._run(...args);
+  }
+
   cancel(): void {
     if(this._delta) {
       this._revert(this._delta);
@@ -91,35 +89,12 @@ class Action<
     }
   }
 
-  done(): void {
-    if(this._delta) {
-      this._delta = null;
-      this.update();
-    }
-  }
-
-  get optimistic(): boolean {
-    return this._optimistic;
-  }
-
-  act(
-    args: ArgsType<Run>,
-    shouldUpdate: boolean = false,
-    optimistic: boolean = false,
-  ): void {
-    if(optimistic) this._delta = this._run(...args);
-    else {
-      this._delta = null;
-      this._run(...args);
-    }
-    if(shouldUpdate) this.update();
-  }
-
   apply(
     delta: ReturnType<Run>,
     shouldUpdate: boolean = true,
   ): void {
     this._apply(delta);
+    this._delta = null;
     if(shouldUpdate) this.update();
   }
 
@@ -128,23 +103,22 @@ class Action<
     shouldUpdate: boolean = true,
   ): void {
     this._revert(delta);
+    this._delta = null;
     if(shouldUpdate) this.update();
   }
 
   update(): void {
-    this.update();
+    this._model.update();
   }
 
-  private _data: Data;
-  private _update: () => void;
-  private _optimistic: boolean;
-  private _delta: ReturnType<Run> | null;
+  private _model: Model;
   private _run: Run;
   private _apply: Apply;
   private _revert: Revert;
+  private _delta: ReturnType<Run> | null;
 }
 
-type ProcessTreeDataDiff = Diff<ProcessTreeData>[] | null;
+type ProcessTreeDataDiff = dd.Diff<ProcessTreeData>[] | undefined;
 
 class ProcessTree extends Model {
   constructor() {
@@ -180,18 +154,21 @@ class ProcessTree extends Model {
   // }
 
   setTreeData = new Action(
-    this.treeData, this.update, false,
+    this,
     (value: ProcessTreeData): ProcessTreeDataDiff => {
-      const delta = diff(this._treeData, value);
+      const delta = dd.diff(this._treeData, value);
       this._treeData = value;
-      if(delta) return delta;
-      return null;
+      return delta;
     },
-    (delta: ProcessTreeDataDiff): void => {
-      this._treeData = delta as unknown as ProcessTreeData;
+    (deltaApply: ProcessTreeDataDiff): void => {
+      if(deltaApply) deltaApply.forEach((change): void => {
+        dd.applyChange(this._treeData, undefined, change);
+      });
     },
-    (delta: ProcessTreeDataDiff): void => {
-      this._treeData = delta as unknown as ProcessTreeData;
+    (deltaRevert: ProcessTreeDataDiff): void => {
+      if(deltaRevert) deltaRevert.forEach((change): void => {
+        dd.revertChange(this._treeData, undefined, change);
+      });
     },
   );
 

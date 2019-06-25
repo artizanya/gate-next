@@ -7,7 +7,7 @@ import React, {
   useContext,
 } from 'react';
 
-type ModelUpdate = () => void;
+export type ModelUpdate = () => void;
 
 class UpdateUnallocatedError extends Error {
   constructor() {

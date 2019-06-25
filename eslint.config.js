@@ -40,6 +40,7 @@ module.exports = {
     // Let tide (or tsc) and js2-mode handle undefined variables
     'no-undef': 'off',
     'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
+    curly: ['error', 'multi'],
     'no-underscore-dangle': ['error', { allowAfterThis: true }],
     'lines-between-class-members': [
       'error', 'always', { exceptAfterSingleLine: true },
