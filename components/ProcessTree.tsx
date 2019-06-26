@@ -23,15 +23,26 @@ function ProcessTree(): JSX.Element {
   // const gate = useStateModel(Gate);
 
   return (
-    <div style={{ height: 600 }}>
-      <SortableTree
-        treeData={gate.store.processTree.treeData}
-        onChange={(treeData): void => {
-          // api.land.setTreeData(treeData as ProcessTreeData)
-          gate.store.processTree.setTreeData.run(treeData as ProcessTreeData);
+    <>
+      <button
+        type="button"
+        onClick={(): void => {
+          console.log('++++ cancel()');
+          gate.store.processTree.setTreeData.cancel();
         }}
-      />
-    </div>
+      >
+        cancel
+      </button>
+      <div style={{ height: 600 }}>
+        <SortableTree
+          treeData={gate.store.processTree.treeData}
+          onChange={(treeData): void => {
+            // api.land.setTreeData(treeData as ProcessTreeData)
+            gate.store.processTree.setTreeData.run(treeData as ProcessTreeData);
+          }}
+        />
+      </div>
+    </>
   );
 }
 

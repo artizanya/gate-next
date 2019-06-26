@@ -90,3 +90,53 @@ const rhs: Test = {
 };
 
 const differences = diff(lhs, rhs);
+
+// ------------------------
+
+import dd from 'deep-diff';
+
+const treeData0 = [{
+  collection: 'processes',
+  id: '0000',
+  title: 'Do something good',
+  children: [{
+    title: 'Input Components',
+    children: [],
+  }, {
+    title: 'Output Components',
+    children: [],
+  }],
+}];
+
+const treeData1 = [{
+  collection: 'processes',
+  id: '0000',
+  title: 'Do something good',
+  expanded: true,
+  children: [{
+    title: 'Input Components',
+    children: [],
+  }, {
+    title: 'Output Components',
+    children: [],
+  }],
+}];
+
+const changes = dd.diff(treeData0, treeData1);
+
+if(changes) changes.forEach((change): void => {
+  dd.applyChange(treeData0, {}, change);
+});
+
+if(changes) changes.forEach((change): void => {
+  dd.revertChange(treeData1, {}, changes[0]);
+});
+
+dd.applyChange(treeData0, undefined, changes[0]);
+
+
+myItems = [1]
+i = myItems.length;
+while (i--) {
+  console.log("***", myItems[i]);
+}

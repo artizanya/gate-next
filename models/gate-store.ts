@@ -151,23 +151,35 @@ class ProcessTree extends Model {
   // ): void {
   //   this._treeData = value;
   //   if(shouldUpdate) this.update();
-  // }
+  // }/
 
   setTreeData = new Action(
     this,
     (value: ProcessTreeData): ProcessTreeDataDiff => {
       const delta = dd.diff(this._treeData, value);
-      this._treeData = value;
+      if(delta) this._treeData = [...value];
       return delta;
     },
     (deltaApply: ProcessTreeDataDiff): void => {
       if(deltaApply) deltaApply.forEach((change): void => {
-        dd.applyChange(this._treeData, undefined, change);
+        dd.applyChange(this._treeData, true, change);
+        this._treeData = [...this._treeData];
       });
     },
     (deltaRevert: ProcessTreeDataDiff): void => {
+      // if(deltaRevert) {
+      //   let i = deltaRevert.length;
+      //   while(i--) {
+      //     const change = deltaRevert[i];
+      //     dd.revertChange(this._treeData, true, change);
+      //     this._treeData = [...this._treeData];
+      //   }
+      // }
+
       if(deltaRevert) deltaRevert.forEach((change): void => {
-        dd.revertChange(this._treeData, undefined, change);
+        console.log("xxx", change);
+        //dd.revertChange(this._treeData, true, change);
+        //this._treeData = [...this._treeData];
       });
     },
   );
