@@ -54,6 +54,8 @@ interface ProcessTreeStore {
   data: ProcessTreeData;
 }
 
+type ProcessTreeStoreDelta = dd.Diff<ProcessTreeStore>[] | undefined;
+
 class ProcessTree extends Model {
   constructor() {
     super();
@@ -84,7 +86,7 @@ class ProcessTree extends Model {
 
   setTreeData = new Action(
     this,
-    (value: ProcessTreeData): dd.Diff<ProcessTreeStore>[] | undefined => {
+    (value: ProcessTreeData): ProcessTreeStoreDelta => {
       const delta = clonedeep(dd.diff(
         this._treeStore,
         { ...this._treeStore, data: value },
