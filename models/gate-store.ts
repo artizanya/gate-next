@@ -1,7 +1,9 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 import * as dd from 'deep-diff';
+import clonedeep from 'lodash.clonedeep';
 
 import { Model } from './use-model';
+import Action from './model-action';
 
 export interface ProcessTreeComponent {
   title: string;
@@ -25,6 +27,15 @@ export interface ProcessTreeProcessOutput {
   expanded?: boolean;
 }
 
+// export interface ProcessTreeItem {
+//   title: string;
+//   id?: string;
+//   collection?: string;
+//   subtitle?: string;
+//   expanded?: boolean;
+//   children?: ProcessTreeItem[];
+// }
+
 export interface ProcessTreeProcess {
   title: string;
   subtitle?: string;
@@ -37,158 +48,69 @@ export interface ProcessTreeProcess {
   expanded?: boolean;
 }
 
-// export interface ProcessTreeItem {
-//   title: string;
-//   id?: string;
-//   collection?: string;
-//   subtitle?: string;
-//   expanded?: boolean;
-//   children?: ProcessTreeItem[];
-// }
-
 export type ProcessTreeData = ProcessTreeProcess[];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
-
-class Action<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Run extends (...args: any[]) => any,
-  Apply extends (delta: ReturnType<Run>) => void,
-  Revert extends (delta: ReturnType<Run>) => void,
-> {
-  constructor(
-    model: Model,
-    run: Run,
-    apply: Apply,
-    revert: Revert,
-  ) {
-    this._model = model;
-    this._run = run;
-    this._apply = apply;
-    this._revert = revert;
-    this._delta = null;
-  }
-
-  run(...args: ArgsType<Run>): void {
-    this._delta = this._run(...args);
-    this.update();
-  }
-
-  batch(...args: ArgsType<Run>): void {
-    this._delta = this._run(...args);
-  }
-
-  cancel(): void {
-    if(this._delta) {
-      this._revert(this._delta);
-      this._delta = null;
-      this.update();
-    }
-  }
-
-  apply(
-    delta: ReturnType<Run>,
-    shouldUpdate: boolean = true,
-  ): void {
-    this._apply(delta);
-    this._delta = null;
-    if(shouldUpdate) this.update();
-  }
-
-  revert(
-    delta: ReturnType<Run>,
-    shouldUpdate: boolean = true,
-  ): void {
-    this._revert(delta);
-    this._delta = null;
-    if(shouldUpdate) this.update();
-  }
-
-  update(): void {
-    this._model.update();
-  }
-
-  private _model: Model;
-  private _run: Run;
-  private _apply: Apply;
-  private _revert: Revert;
-  private _delta: ReturnType<Run> | null;
+interface ProcessTreeStore {
+  data: ProcessTreeData;
 }
-
-type ProcessTreeDataDiff = dd.Diff<ProcessTreeData>[] | undefined;
 
 class ProcessTree extends Model {
   constructor() {
     super();
 
-    this._treeData = [{
-      collection: 'processes',
-      id: '0000',
-      title: 'Do something good',
-      children: [{
-        title: 'Input Components',
-        children: [],
-      }, {
-        title: 'Output Components',
-        children: [],
+    this._treeStore = {
+      data: [{
+        collection: 'processes',
+        id: '0000',
+        title: 'Do something good',
+        children: [{
+          title: 'Input Components',
+          children: [],
+        }, {
+          title: 'Output Components',
+          children: [],
+        }],
       }],
-    }];
-
-    // this._treeData = [{
-    //   title: 'Chicken',
-    //   children: [{
-    //     title: 'Egg',
-    //   }],
-    // }];
+    };
   }
 
   // setTreeData(
   //   value: ProcessTreeData,
-  //   shouldUpdate = true,
+  //   update = true,
   // ): void {
   //   this._treeData = value;
-  //   if(shouldUpdate) this.update();
+  //   if(update) this.update();
   // }/
 
   setTreeData = new Action(
     this,
-    (value: ProcessTreeData): ProcessTreeDataDiff => {
-      const delta = dd.diff(this._treeData, value);
-      if(delta) this._treeData = [...value];
+    (value: ProcessTreeData): dd.Diff<ProcessTreeStore>[] | undefined => {
+      const delta = clonedeep(dd.diff(
+        this._treeStore,
+        { ...this._treeStore, data: value },
+      ));
+      if(delta) this._treeStore.data = [...value];
       return delta;
     },
-    (deltaApply: ProcessTreeDataDiff): void => {
+    (deltaApply): void => {
       if(deltaApply) deltaApply.forEach((change): void => {
-        dd.applyChange(this._treeData, true, change);
-        this._treeData = [...this._treeData];
+        dd.applyChange(this._treeStore, true, change);
+        this._treeStore.data = [...this._treeStore.data];
       });
     },
-    (deltaRevert: ProcessTreeDataDiff): void => {
-      // if(deltaRevert) {
-      //   let i = deltaRevert.length;
-      //   while(i--) {
-      //     const change = deltaRevert[i];
-      //     dd.revertChange(this._treeData, true, change);
-      //     this._treeData = [...this._treeData];
-      //   }
-      // }
-
+    (deltaRevert): void => {
       if(deltaRevert) deltaRevert.forEach((change): void => {
-        console.log("xxx", change);
-        //dd.revertChange(this._treeData, true, change);
-        //this._treeData = [...this._treeData];
+        dd.revertChange(this._treeStore, true, change);
+        this._treeStore.data = [...this._treeStore.data];
       });
     },
   );
 
   get treeData(): ProcessTreeData {
-    return this._treeData;
+    return this._treeStore.data;
   }
 
-  private _treeData: ProcessTreeData;
+  private _treeStore: ProcessTreeStore;
 }
 
 export default class GateStore extends Model {

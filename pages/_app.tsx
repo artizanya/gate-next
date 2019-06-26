@@ -13,11 +13,9 @@ class GateApp extends App {
     let pageProps = {};
 
     // Provide the store to getInitialProps of pages
-    if(Component.getInitialProps) {
-      pageProps = await Component.getInitialProps({
-        ...ctx,
-      });
-    }
+    if(Component.getInitialProps) pageProps = await Component.getInitialProps({
+      ...ctx,
+    });
 
     return {
       pageProps,

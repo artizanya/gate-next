@@ -94,6 +94,7 @@ const differences = diff(lhs, rhs);
 // ------------------------
 
 import dd from 'deep-diff';
+import clonedeep from 'lodash.clonedeep';
 
 const treeData0 = [{
   collection: 'processes',
@@ -108,32 +109,65 @@ const treeData0 = [{
   }],
 }];
 
-const treeData1 = [{
-  collection: 'processes',
-  id: '0000',
-  title: 'Do something good',
-  expanded: true,
-  children: [{
+const treeData1 = {
+  data: [{
+    collection: 'processes',
+    id: '0000',
+    title: 'Do something good',
+    expanded: true,
+    children: [{
+      title: 'Input Components',
+      children: [],
+    }, {
+      title: 'Output Components',
+      children: [],
+    }],
+  }]
+};
+
+const treeData2 = {
+  data: [{
     title: 'Input Components',
     children: [],
   }, {
-    title: 'Output Components',
-    children: [],
+    title: 'Do something good',
+    collection: 'processes',
+    id: '0000',
+    expanded: true,
+    children: [{
+      title: 'Output Components',
+      children: [],
+    }],
   }],
-}];
+};
 
-const changes = dd.diff(treeData0, treeData1);
+const changes = dd.diff(treeData1, treeData2);
 
 if(changes) changes.forEach((change): void => {
-  dd.applyChange(treeData0, {}, change);
+  dd.applyChange(treeData1, true, change);
 });
 
 if(changes) changes.forEach((change): void => {
-  dd.revertChange(treeData1, {}, changes[0]);
+  dd.revertChange(treeData1, true, change);
 });
 
-dd.applyChange(treeData0, undefined, changes[0]);
+dd.revertChange(treeData1, true, changes[0]);
 
+let i = changes.length;
+while(i--) {
+  const change = deltaRevert[i];
+  dd.revertChange(this._treeData, true, change);
+  this._treeData = [...this._treeData];
+}
+
+// Comments to deep-diff creator:
+//   * Apply/revert second argument has to be truthy
+//   * Using object returned by diff needs to be deep-cloned
+//     to apply/revert on the same tree from which it was created.
+//     Otherwise may end-up with circular refs in the tree.
+//   * Root object passed as the first argument to apply/revert may not be
+//     array besouse revertChange() function does "u = change.path.length - 1;"
+//     and change.path does not exist on DiffArray.
 
 myItems = [1]
 i = myItems.length;
