@@ -33,13 +33,23 @@ function ProcessTree(): JSX.Element {
       >
         cancel
       </button>
+      <button
+        type="button"
+        onClick={(): void => {
+          console.log('++++ done()');
+          gate.store.processTree.setTreeData.done();
+        }}
+      >
+        done
+      </button>
       <div style={{ height: 600 }}>
         <SortableTree
           treeData={gate.store.processTree.treeData}
           onChange={(treeData): void => {
             // api.land.setTreeData(treeData as ProcessTreeData)
             console.log('****', treeData);
-            gate.store.processTree.setTreeData.run(treeData as ProcessTreeData);
+            gate.store.processTree
+              .setTreeData.do(treeData as ProcessTreeData).update();
           }}
         />
       </div>

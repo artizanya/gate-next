@@ -7,6 +7,12 @@ import { Model } from './use-model';
 type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
 
+class ActionAttemptBeforeDone extends Error {
+  constructor() {
+    super('Attempt to perform Action before previous run is done.');
+  }
+}
+
 export default class Action<
   Run extends (...args: any[]) => any,
   Apply extends (delta: ReturnType<Run>) => void,
@@ -25,9 +31,22 @@ export default class Action<
     this._delta = null;
   }
 
-  run(...args: ArgsType<Run>): void {
+  run(...args: ArgsType<Run>): this {
+    if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._delta = this._run(...args);
     this.update();
+    return this;
+  }
+
+  do(...args: ArgsType<Run>): this {
+    if(!this.isDone()) throw new ActionAttemptBeforeDone();
+    this._delta = this._run(...args);
+    return this;
+  }
+
+  update(): this {
+    this._model.update();
+    return this;
   }
 
   isDone(): boolean {
@@ -46,26 +65,16 @@ export default class Action<
     }
   }
 
-  batch(args: ArgsType<Run>, update: boolean, done: boolean): void {
-    this._delta = this._run(...args);
-    if(update) this.update();
-    if(done) this.done();
-  }
-
-  apply(delta: ReturnType<Run>, update: boolean): void {
+  apply(delta: ReturnType<Run>): this {
+    if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._apply(delta);
-    this._delta = null;
-    if(update) this.update();
+    return this;
   }
 
-  revert(delta: ReturnType<Run>, update: boolean): void {
+  revert(delta: ReturnType<Run>): this {
+    if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._revert(delta);
-    this._delta = null;
-    if(update) this.update();
-  }
-
-  update(): void {
-    this._model.update();
+    return this;
   }
 
   private _model: Model;

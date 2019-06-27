@@ -141,6 +141,7 @@ const treeData2 = {
   }],
 };
 
+const changes = dd.diff(treeData0, treeData1);
 const changes = dd.diff(treeData1, treeData2);
 
 if(changes) changes.forEach((change): void => {
