@@ -1,12 +1,9 @@
 // Hey Emacs, this is -*- coding: utf-8 -*-
 
 // import React, { useState, useCallback } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SortableTree from 'react-sortable-tree';
 
-// import { ProcessTreeData } from '../models/gate';
-// import { useGateApiContext } from '../models/land-api';
-// import { useStateModel } from '../models/react-state-model';
 import { ProcessTreeData } from '../models/gate-store';
 import { useGateRefContext } from '../models/gate';
 
@@ -19,8 +16,13 @@ import 'react-sortable-tree/style.css';
 function ProcessTree(): JSX.Element {
   console.log('**** here');
 
-  const { model: gate } = useGateRefContext();
-  // const gate = useStateModel(Gate);
+  const { current: gate } = useGateRefContext();
+  // const landApi = gate.landApi;
+
+  useEffect((): void => {
+    gate.landApi.loadProcessTree();
+  }, [gate.landApi, gate.landApi.changed]);
+
 
   return (
     <>
@@ -49,7 +51,7 @@ function ProcessTree(): JSX.Element {
             // api.land.setTreeData(treeData as ProcessTreeData)
             console.log('****', treeData);
             gate.store.processTree
-              .setTreeData.do(treeData as ProcessTreeData).update();
+              .setTreeData.run(treeData as ProcessTreeData);
           }}
         />
       </div>

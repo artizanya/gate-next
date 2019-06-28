@@ -7,6 +7,26 @@ import React, {
   useContext,
 } from 'react';
 
+export interface Done {
+  done(): void;
+}
+
+export interface Update<R = void> {
+  update(): R;
+}
+
+export class ChangeObservable {
+  change(): void {
+    this._changed += 1;
+  }
+
+  get changed(): number {
+    return this._changed;
+  }
+
+  private _changed: number = 0;
+}
+
 export type ModelUpdate = () => void;
 
 class UpdateUnallocatedError extends Error {
@@ -16,9 +36,9 @@ class UpdateUnallocatedError extends Error {
   }
 }
 
-export class Model {
-  get update(): ModelUpdate {
-    return this._update;
+export class Model extends ChangeObservable {
+  update(): void {
+    this._update();
   }
 
   setUpdate(value: ModelUpdate): void {
@@ -35,7 +55,7 @@ export class Model {
 }
 
 interface Ref<M extends Model> {
-  model: M;
+  current: M;
 }
 
 interface ModelClass<M extends Model> {
@@ -46,17 +66,17 @@ export function useModelRef<M extends Model>(
   ModelClass: ModelClass<M>,
 ): Ref<M> {
   const [modelRef, setModelRef] = useState(
-    (): Ref<M> => ({ model: new ModelClass() }),
+    (): Ref<M> => ({ current: new ModelClass() }),
   );
 
   const update: () => void = useCallback(
     (): void => setModelRef(
-      (prevRef: Ref<M>): Ref<M> => ({ model: prevRef.model }),
+      (prevRef: Ref<M>): Ref<M> => ({ current: prevRef.current }),
     ),
     [setModelRef],
   );
 
-  useState((): void => modelRef.model.setUpdate(update));
+  useState((): void => modelRef.current.setUpdate(update));
 
   return modelRef;
 }

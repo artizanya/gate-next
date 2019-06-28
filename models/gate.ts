@@ -2,6 +2,7 @@
 
 import { Model, createModelRefContextProvider } from './use-model';
 import GateStore from './gate-store';
+import LandApi, { configLandUri } from './land-api';
 
 export default class Gate extends Model {
   constructor() {
@@ -14,7 +15,12 @@ export default class Gate extends Model {
     return this._store;
   }
 
+  get landApi(): LandApi {
+    return this._landApi;
+  }
+
   private _store: GateStore = new GateStore();
+  private _landApi = new LandApi(this._store, configLandUri);
 }
 
 const [

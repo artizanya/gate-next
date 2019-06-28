@@ -2,7 +2,7 @@
 
 /* eslint @typescript-eslint/no-explicit-any: off */
 
-import { Model } from './use-model';
+import { Model, Update, Done } from './use-model';
 
 type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
@@ -31,20 +31,20 @@ export default class Action<
     this._delta = null;
   }
 
-  run(...args: ArgsType<Run>): this {
+  run(...args: ArgsType<Run>): Done {
     if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._delta = this._run(...args);
     this.update();
     return this;
   }
 
-  do(...args: ArgsType<Run>): this {
+  do(...args: ArgsType<Run>): Update<Done> & Done {
     if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._delta = this._run(...args);
     return this;
   }
 
-  update(): this {
+  update(): Done {
     this._model.update();
     return this;
   }
@@ -65,13 +65,13 @@ export default class Action<
     }
   }
 
-  apply(delta: ReturnType<Run>): this {
+  apply(delta: ReturnType<Run>): Update<Done> {
     if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._apply(delta);
     return this;
   }
 
-  revert(delta: ReturnType<Run>): this {
+  revert(delta: ReturnType<Run>): Update<Done> {
     if(!this.isDone()) throw new ActionAttemptBeforeDone();
     this._revert(delta);
     return this;
