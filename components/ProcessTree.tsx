@@ -2,7 +2,7 @@
 
 // import React, { useState, useCallback } from 'react';
 import React, { useEffect } from 'react';
-import SortableTree from 'react-sortable-tree';
+import SortableTree, * as rst from 'react-sortable-tree';
 
 import { ProcessTreeData } from '../models/gate-store';
 import { useGateRefContext } from '../models/gate';
@@ -53,6 +53,11 @@ function ProcessTree(): JSX.Element {
             gate.store.processTree
               .setTreeData.run(treeData as ProcessTreeData);
           }}
+          onVisibilityToggle={
+            (toggleData: rst.OnVisibilityToggleData & rst.TreePath) => {
+              console.log('&&&&');
+            }
+          }
         />
       </div>
     </>
