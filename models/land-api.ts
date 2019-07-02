@@ -2,7 +2,7 @@
 
 import fetch from 'isomorphic-unfetch';
 
-import { ChangeObservable, Update } from './use-model';
+import { Api, Update } from './use-model';
 
 import GateStore, {
   ProcessTreeProcess,
@@ -20,7 +20,7 @@ export class LandSource {
   uri: string;
 }
 
-export default class LandApi extends ChangeObservable {
+export default class LandApi extends Api {
   constructor(
     gateStore: GateStore,
     source: LandSource | string,

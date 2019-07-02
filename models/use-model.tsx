@@ -15,7 +15,7 @@ export interface Update<R = void> {
   update(): R;
 }
 
-export abstract class ChangeObservable {
+export abstract class Api {
   change(): void {
     this._changed += 1;
   }
@@ -38,7 +38,7 @@ class UpdateUnallocatedError extends Error {
   }
 }
 
-export class Model extends ChangeObservable {
+export class Model extends Api {
   update(): void {
     this._update();
   }
@@ -56,7 +56,7 @@ export class Model extends ChangeObservable {
   };
 }
 
-interface Ref<M extends Model> {
+export interface Ref<M extends Model> {
   current: M;
 }
 

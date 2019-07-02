@@ -2,7 +2,7 @@
 
 /* eslint @typescript-eslint/no-explicit-any: off */
 
-import { Model, Update, Done } from './use-model';
+import { Api, Update, Done } from './use-model';
 
 type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 type ArgsType<T> = T extends (...args: infer A) => any ? A : never;
@@ -19,12 +19,12 @@ export default class Action<
   Revert extends (delta: ReturnType<Run>) => void,
 > {
   constructor(
-    model: Model,
+    api: Api,
     run: Run,
     apply: Apply,
     revert: Revert,
   ) {
-    this._model = model;
+    this._api = api;
     this._run = run;
     this._apply = apply;
     this._revert = revert;
@@ -45,7 +45,7 @@ export default class Action<
   }
 
   update(): Done {
-    this._model.update();
+    this._api.update();
     return this;
   }
 
@@ -77,7 +77,7 @@ export default class Action<
     return this;
   }
 
-  private _model: Model;
+  private _api: Api;
   private _run: Run;
   private _apply: Apply;
   private _revert: Revert;
