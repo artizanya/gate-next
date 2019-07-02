@@ -15,7 +15,7 @@ export interface Update<R = void> {
   update(): R;
 }
 
-export class ChangeObservable {
+export abstract class ChangeObservable {
   change(): void {
     this._changed += 1;
   }
@@ -23,6 +23,8 @@ export class ChangeObservable {
   get changed(): number {
     return this._changed;
   }
+
+  abstract update(): void
 
   private _changed: number = 0;
 }
