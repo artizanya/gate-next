@@ -23,7 +23,6 @@ function ProcessTree(): JSX.Element {
     gate.landApi.loadProcessTree();
   }, [gate.landApi, gate.landApi.changed]);
 
-
   return (
     <>
       <button
