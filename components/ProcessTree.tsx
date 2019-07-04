@@ -45,6 +45,7 @@ function ProcessTree(): JSX.Element {
       </button>
       <div style={{ height: 600 }}>
         <SortableTree
+          isVirtualized={false}
           treeData={gate.store.processTree.treeData}
           onChange={(treeData): void => {
             // api.land.setTreeData(treeData as ProcessTreeData)

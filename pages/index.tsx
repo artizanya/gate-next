@@ -2,16 +2,19 @@
 
 import React from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 
-type ProcessTreeModule = typeof import('../components/ProcessTree');
+import ProcessTree from '../components/ProcessTree';
 
-const ProcessTree = dynamic(
-  (): Promise<ProcessTreeModule> => (
-    import('../components/ProcessTree')
-  ),
-  { ssr: false },
-);
+// import dynamic from 'next/dynamic';
+//
+// type ProcessTreeModule = typeof import('../components/ProcessTree');
+//
+// const ProcessTree = dynamic(
+//   (): Promise<ProcessTreeModule> => (
+//     import('../components/ProcessTree')
+//   ),
+//   { ssr: false },
+// );
 
 const Index = (): JSX.Element => (
   <div>
