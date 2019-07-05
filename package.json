@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "Victor Rybynok",
-  "license": "ISC",
+  "license": "?",
   "eslintConfig": {
     "extends": "./eslint.config.js"
   },
