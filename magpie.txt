@@ -32,3 +32,8 @@ https://github.com/pashky/restclient.el
 On Bazel module and target quest
 https://github.com/bazelbuild/rules_typescript/issues/175
 https://blog.nrwl.io/production-bundling-with-bazel-839ac4c52041
+https://medium.com/@Jakeherringbone/running-tools-under-bazel-8aa416e7090c
+https://docs.bazel.build/versions/master/rule-challenges.html
+
+TypeScript AST-level meta-programming
+https://levelup.gitconnected.com/writing-typescript-custom-ast-transformer-part-1-7585d6916819
